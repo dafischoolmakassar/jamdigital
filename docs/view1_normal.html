@@ -565,6 +565,22 @@
             setInterval(updateClock, 1000);
             runNormalCarousel();
         };
+
+        /* -------------------------------------------------------------
+         * PERCOBAAN AUTO-FULLSCREEN
+         * Browser modern MEMBLOKIR fullscreen otomatis tanpa gesture user --
+         * ini cuma fallback kalau halaman dibuka di browser biasa (bukan
+         * Fully Kiosk Browser yang sudah punya mode "Immersive/Force
+         * Fullscreen" sendiri di setting app-nya, cara yang lebih reliable
+         * untuk kiosk Android box).
+         * ------------------------------------------------------------- */
+        function attemptFullscreen() {
+            const el = document.documentElement;
+            if (el.requestFullscreen) el.requestFullscreen().catch(() => {});
+        }
+        window.addEventListener('load', attemptFullscreen);
+        document.addEventListener('click', attemptFullscreen, { once: true });
+        document.addEventListener('touchstart', attemptFullscreen, { once: true });
     </script>
 </body>
 </html>
