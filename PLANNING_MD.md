@@ -48,6 +48,7 @@ Kelima view sekarang masing-masing punya 1 file HTML sendiri, sudah diberi label
 | View 2 — Menjelang Adzan | `view2_menjelang_adzan.html` | Sudah ada, siap dipoles |
 | View 3 — Adzan Berkumandang | `view3_adzan.html` | Sudah ada, siap dipoles |
 | View 4 — Menjelang Iqomah | `view4_menjelang_iqomah.html` | **Baru dibuat** (adaptasi dari View 2, aksen warna emerald supaya beda dari View 2) — perlu direview |
+| View 4 — Menjelang Iqomah (Tipe 2) | `view4_menjelang_iqomah_tipe2.html` | **Varian desain alternatif** (2026-09-17) — timer MM:SS besar (gaya kotak seperti View 3) + progress bar linear, bukan angka kecil di dalam spinner/ring seperti Tipe 1. Belum disambungkan ke state machine (`state-machine.js` masih pakai Tipe 1 secara default) — perlu keputusan mana yang dipakai final atau dijadikan opsi tema seperti View 1. |
 | View 5 — Sholat Berlangsung | `view5_sholat_berlangsung.html` | **Baru dibuat** (kaligrafi/ayat bergantian, tanpa countdown & tanpa jam besar sesuai catatan risiko #kekhusyukan) — perlu direview |
 | *(arsip)* | `archive/dafi_digital_display_masjid_boxed-clock.html` | Versi lama View 1, disimpan sebagai referensi |
 | Admin Panel | `admin_settings.html` | **Sudah tersambung ke backend asli** (2026-09-17) — form Profil Masjid (+ pemilih Tema View 1 + ganti password), Jadwal Sholat (manual harian + pengaturan API untuk fase depan), Durasi & Transisi View, Slideshow Gambar (upload asli ke server), Preview Config JSON. Login & data tidak lagi pakai `localStorage`/password hardcoded — lihat Bagian 4.1 untuk detail backend. |
@@ -117,16 +118,13 @@ State machine dievaluasi setiap detik dari satu sumber waktu (`Date.now()`), buk
 ## 4. Arsitektur & Teknologi
 
 ### Kiosk App (layar utama di masjid)
-- **1 halaman (SPA)**, bukan 3 file terpisah. Tiap view = satu `<section>`/komponen yang di-show/hide via state manager, supaya jam, slideshow, dan koneksi API tidak reset saat pindah state.
+- **Bukan SPA penuh seperti rencana awal** — realisasinya `view1.php` (View 1, Normal) + **overlay `<iframe>`** yang dimuat dari `state-machine.js` untuk View 2-5 saat dibutuhkan. Ini dipilih ketimbang menggabung semua script ke 1 halaman karena tiap view awalnya dibangun sebagai file berdiri sendiri dengan nama variabel/fungsi yang sama (`updateRealtimeClock`, `daysIndo`, dst) — iframe memberi tiap view scope JS terpisah tanpa perlu namespace ulang semuanya, dengan trade-off overhead render iframe yang minor untuk skala 1 kiosk.
 - **HTML5 + Tailwind CSS (CDN)** — konsisten dengan prototype yang sudah ada, tidak perlu build step/bundler untuk kiosk device yang sederhana.
-- **Vanilla JavaScript (ES Modules)**, dipecah per tanggung jawab:
-  - `clock.js` — jam & tanggal realtime (Masehi + Hijriah)
-  - `prayerSchedule.js` — fetch + cache jadwal dari API, apply koreksi manual
-  - `stateMachine.js` — logika transisi 6 state di atas
-  - `slideshow.js` — carousel gambar fullscreen
-  - `viewManager.js` — render/switch antar view section
-  - `audio.js` — beep/chime via Web Audio API (titik ekstensi untuk audio adzan asli nanti)
-- **Fetch API** ke Aladhan API (`method=20` untuk pendekatan Kemenag RI) berdasarkan koordinat masjid, di-refresh 1x/hari (misal jam 00:05) + fallback ke cache `localStorage` kalau device offline saat refresh.
+- **Vanilla JavaScript**, dipecah per tanggung jawab:
+  - `docs/state-machine.js` — hitung state (`NORMAL`/`MENJELANG_ADZAN`/`ADZAN`/`MENJELANG_IQOMAH`/`SHOLAT`) dari config + jam sekarang, kendalikan iframe overlay & sub-rotasi View 1 (lihat Fase 2 di Bagian 7 untuk detail)
+  - Tiap `docs/view*.html` tetap punya script sendiri (jam, tanggal, countdown, dst) — dibaca lewat query string kalau dimuat sebagai iframe oleh state machine, atau data demo hardcoded kalau dibuka standalone
+  - `audio.js` — **belum dibuat sebagai file terpisah**; beep/chime saat ini inline di tiap view (`playBeepSound()`), titik ekstensi untuk audio adzan asli nanti tetap sama
+- **Prayer Schedule**: saat ini **manual** lewat Admin Panel (`config.prayerSchedule`), belum fetch API — integrasi Aladhan API (`method=20` untuk pendekatan Kemenag RI, refresh 1x/hari + fallback cache) masih rencana Fase 3, belum dikerjakan.
 - **FontAwesome 6 + Google Fonts** (Inter, Plus Jakarta Sans, Orbitron, Amiri) — dipertahankan dari prototype.
 - Kiosk dijalankan **fullscreen via Chrome kiosk mode** (`chrome --kiosk https://domain/view1.php`) di Android TV box/mini PC, resolusi target 1920×1080 landscape — bukan trik Fullscreen API dari JS, karena browser modern menolak fullscreen otomatis tanpa gesture user. Kiosk mode menyelesaikan ini di level device/OS.
 - **Watchdog**: auto-reload halaman 1x/hari di jam sepi (misal jam 02:00) untuk mencegah memory leak dari proses yang berjalan 24 jam.
@@ -268,15 +266,23 @@ const config = {
 ## 7. Rencana Fase Implementasi
 
 ### Fase 1 — Fondasi SPA & Refactor (2–3 hari)
-- [ ] Gabungkan 3 prototype jadi 1 SPA dengan `viewManager.js`
-- [ ] Pindahkan jam, tanggal, marquee jadi modul bersama (hilangkan duplikasi)
-- [ ] Sembunyikan panel simulasi di balik `?dev=1`
+- [x] ~~Gabungkan 3 prototype jadi 1 SPA dengan `viewManager.js`~~ — diselesaikan dengan pendekatan berbeda, lihat Fase 2 (iframe + state machine, bukan SPA penuh)
+- [x] Pindahkan jam, tanggal, marquee jadi data yang di-drive config (masing-masing view tetap punya markup sendiri, tapi datanya seragam dari `window.__DAFI_CONFIG__` / query param)
+- [ ] Sembunyikan panel simulasi di balik `?dev=1` — saat ini panel demo otomatis hilang saat dibuka lewat `view1.php` (ada query param asli), tapi masih selalu tampil kalau file dibuka standalone tanpa `?dev=1` eksplisit
 
-### Fase 2 — State Machine & 2 View Baru (2 hari)
-- [ ] Implementasi `stateMachine.js` sesuai peta di Bagian 2 & 3
-- [ ] Bangun view **MENJELANG_IQOMAH**
-- [ ] Bangun view **SHOLAT_BERLANGSUNG** (kaligrafi tenang, tanpa timer)
-- [ ] Uji transisi penuh: NORMAL → MENJELANG_ADZAN → ADZAN → MENJELANG_IQOMAH → SHOLAT_BERLANGSUNG → NORMAL
+### Fase 2 — State Machine & 2 View Baru (2 hari) — **SELESAI (2026-09-17)**
+- [x] Bangun view **MENJELANG_IQOMAH** (View 4)
+- [x] Bangun view **SHOLAT_BERLANGSUNG** (View 5, kaligrafi tenang, tanpa timer)
+- [x] Implementasi state machine — **`docs/state-machine.js`**, bukan pendekatan SPA gabung-semua-jadi-satu-script seperti rencana awal. Pendekatannya:
+  - `view1.php` menyisipkan `<div id="state-overlay"><iframe id="state-iframe"></iframe></div>` + `<script src="docs/state-machine.js">` sebelum `</body>`.
+  - Tiap detik, `state-machine.js` hitung state seharusnya (`NORMAL` / `MENJELANG_ADZAN` / `ADZAN` / `MENJELANG_IQOMAH` / `SHOLAT`) dari `window.__DAFI_CONFIG__.prayerSchedule` + `.timing`, dibanding jam sekarang (`new Date()`).
+  - Selain NORMAL, view yang sesuai (`docs/view2..5.html`) dimuat ke `<iframe>` dengan data asli lewat **query string** (`?prayer=Dzuhur&target=2026-09-17T...&mosqueName=...&mosqueAddress=...&runningText=...`) — **bukan** digabung jadi satu script, supaya variabel/fungsi tiap view (yang sebelumnya berdiri sendiri) tidak bentrok satu sama lain.
+  - View 2, 3, 4 dimodifikasi supaya baca `URLSearchParams(location.search)`: kalau ada `target`, jalankan hitung mundur **sungguhan** ke waktu itu (bukan demo 60 detik lagi) & sembunyikan Panel Simulasi Demo; kalau tidak ada (dibuka standalone), tetap jalan mode demo seperti sebelumnya.
+  - View 5 baca `?prayer=` untuk ganti label "Sedang Sholat [Nama] Berjamaah".
+  - Saat keluar dari NORMAL, `carouselTimer` (sub-rotasi View 1) di-`clearTimeout` dan direset ke `dashboard`; saat balik ke NORMAL, `runNormalCarousel()` dipanggil lagi.
+  - **Alur Jumat** (Dzuhur di hari Jumat): tidak ada fase MENJELANG_IQOMAH terpisah — begitu adzan selesai, langsung ke View 5 (kaligrafi) selama `khutbahDurationMinutes + sholatDurationMinutes` gabungan, sesuai catatan MVP di Bagian 2.
+- [x] Uji transisi penuh: NORMAL → MENJELANG_ADZAN → ADZAN → MENJELANG_IQOMAH → SHOLAT → NORMAL (diuji end-to-end pakai jadwal dipercepat, semua transisi terkonfirmasi jalan otomatis tanpa reload halaman)
+- [x] Format countdown View 2 & View 4 diubah dari detik mentah ke **MM:SS** (mis. `09:45`) karena durasi menjelang adzan/iqomah biasanya beberapa menit, bukan puluhan detik
 
 ### Fase 3 — Integrasi Jadwal Sholat API (1–2 hari)
 - [ ] Integrasi Aladhan API berdasarkan koordinat masjid
