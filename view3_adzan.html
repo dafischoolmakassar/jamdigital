@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIEW 3 - Adzan Berkumandang | Jasma Digital</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;600;700;800;900&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: radial-gradient(circle at 50% 30%, #061826 0%, #030a12 60%, #010408 100%);
+            color: #ffffff;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        .font-arabic {
+            font-family: 'Amiri', serif;
+        }
+
+        .font-digital {
+            font-family: 'Orbitron', monospace;
+        }
+
+        /* Ambient Glow Effects */
+        .glow-emerald {
+            box-shadow: 0 0 50px rgba(16, 185, 129, 0.15);
+        }
+
+        .glow-amber {
+            box-shadow: 0 0 40px rgba(245, 158, 11, 0.2);
+        }
+
+        /* Marquee Animation for Running Text */
+        @keyframes marquee {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+
+        .animate-marquee {
+            display: inline-block;
+            white-space: nowrap;
+            animation: marquee 25s linear infinite;
+        }
+
+        /* Progress Bar Smooth Transition */
+        .progress-fill {
+            transition: width 1s linear, background-color 0.5s ease;
+        }
+
+        /* Pulse Ring Animation */
+        @keyframes subtlePulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.02); opacity: 0.9; }
+        }
+
+        .animate-pulse-subtle {
+            animation: subtlePulse 3s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="h-screen w-screen flex flex-col justify-between p-4 md:p-6 relative">
+    <div class="fixed top-1.5 left-1.5 z-50 bg-black/70 border border-white/20 text-[9px] font-bold text-white/80 px-2 py-0.5 rounded-full tracking-widest uppercase pointer-events-none">View 3 &middot; Adzan Berkumandang</div>
+
+    <!-- TOP HEADER -->
+    <header class="relative z-10 bg-slate-900/80 backdrop-blur-md border border-slate-800 rounded-2xl p-4 flex flex-col md:flex-row justify-between items-center shadow-2xl">
+        <!-- Accent Top Bar -->
+        <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 via-teal-400 to-amber-400 rounded-t-2xl"></div>
+
+        <!-- Left: Mosque Info -->
+        <div class="flex items-center space-x-4 mb-2 md:mb-0">
+            <div class="w-12 h-12 md:w-14 md:h-14 bg-gradient-to-br from-emerald-400 to-teal-600 rounded-xl flex items-center justify-center text-slate-950 text-2xl font-black shadow-lg shadow-emerald-500/20">
+                <i class="fa-solid fa-mosque"></i>
+            </div>
+            <div>
+                <h1 class="text-xl md:text-2xl font-black text-amber-400 tracking-wide uppercase">Masjid Agung Al-Ikhlas</h1>
+                <p class="text-xs md:text-sm text-slate-300 font-medium">Jl. Utama No. 123, Cebongan, Yogyakarta</p>
+            </div>
+        </div>
+
+        <!-- Center: Date Information -->
+        <div class="text-center bg-slate-950/60 px-5 py-2 rounded-xl border border-slate-800 my-1 md:my-0">
+            <div id="day-name" class="text-emerald-400 font-bold text-sm md:text-base">Selasa / Tsulatsa</div>
+            <div class="flex items-center justify-center space-x-2 text-xs md:text-sm text-slate-200 font-semibold">
+                <span id="gregorian-date">22 Maret 2026 M</span>
+                <span class="text-amber-400">•</span>
+                <span id="hijri-date" class="text-amber-300">19 Sya'ban 1447 H</span>
+            </div>
+        </div>
+
+        <!-- Right: Realtime Clock (Clean, Large Digital Display) -->
+        <div class="text-right flex flex-col items-end">
+            <span class="text-[10px] uppercase tracking-widest text-slate-400 font-semibold mb-0.5">Waktu Sekarang</span>
+            <div id="realtime-clock" class="text-3xl md:text-5xl font-extrabold font-digital text-white tracking-wider">
+                00:00:00
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN DISPLAY: LATAR POLOS ELEGAN & COUNTDOWN PROGRESS BAR -->
+    <main class="relative z-10 flex-1 flex flex-col items-center justify-center my-6 px-4">
+        
+        <!-- Calligraphy / Header Call -->
+        <div class="text-center mb-6 animate-pulse-subtle">
+            <p class="font-arabic text-4xl sm:text-6xl text-amber-400 mb-3 tracking-wide drop-shadow-md">
+                اللهُ أَكْبَرُ اللهُ أَكْبَرُ
+            </p>
+            <div class="inline-flex items-center space-x-2 bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 px-6 py-2 rounded-full text-sm md:text-base font-bold tracking-wider uppercase backdrop-blur-md shadow-lg">
+                <span class="w-3 h-3 rounded-full bg-emerald-400 animate-ping"></span>
+                <span>AZAN <span id="current-prayer-name">DZUHUR</span> BERKUMANDANG</span>
+            </div>
+        </div>
+
+        <!-- MAIN COUNTDOWN BOX WITH PROGRESS BAR -->
+        <div class="w-full max-w-3xl bg-slate-900/80 border border-slate-800 rounded-3xl p-6 sm:p-10 shadow-2xl backdrop-blur-xl text-center relative overflow-hidden glow-emerald">
+            
+            <p class="text-xs md:text-sm uppercase tracking-widest text-slate-400 font-extrabold mb-2">
+                Sisa Waktu Menjawab Azan / Persiapan Shalat
+            </p>
+
+            <!-- Digital Timer Display -->
+            <div id="countdown-display" class="text-7xl sm:text-9xl font-black font-digital text-white tracking-widest my-2 drop-shadow-xl">
+                01:00
+            </div>
+
+            <!-- PROGRESS BAR CONTAINER -->
+            <div class="w-full bg-slate-950/80 rounded-full h-7 p-1 relative overflow-hidden border border-slate-800 shadow-inner my-6">
+                <!-- Decreasing Progress Fill Bar -->
+                <div id="progress-bar" class="progress-fill h-full bg-gradient-to-r from-emerald-500 via-teal-400 to-amber-400 rounded-full w-full shadow-lg"></div>
+            </div>
+
+            <!-- Progress Bar Markers Info -->
+            <div class="flex justify-between text-xs md:text-sm font-semibold text-slate-400 px-1">
+                <span class="flex items-center gap-1"><i class="fa-regular fa-clock text-slate-500"></i> 0 Detik</span>
+                <span id="duration-label" class="text-emerald-400 font-bold">Durasi Azan: 1 Menit (60 Detik)</span>
+            </div>
+        </div>
+
+        <!-- Subtitle Prompt -->
+        <p class="mt-6 text-sm md:text-base text-slate-300 text-center font-medium max-w-xl leading-relaxed">
+            Disunnahkan untuk mendengarkan azan, menirukan lafal azan, dan membaca doa sesudah azan.
+        </p>
+    </main>
+
+    <!-- FOOTER RUNNING TEXT -->
+    <footer class="relative z-10 bg-slate-900/90 border border-slate-800 rounded-2xl px-4 py-3 overflow-hidden flex items-center shadow-2xl">
+        <div class="bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 text-xs font-black px-3.5 py-1.5 rounded-xl uppercase tracking-wider mr-3 flex items-center shrink-0 shadow-md">
+            <i class="fa-solid fa-volume-xmark mr-2 text-sm"></i> Perhatian
+        </div>
+        <div class="overflow-hidden w-full relative">
+            <div id="running-text" class="animate-marquee font-semibold text-sm md:text-base text-amber-200 tracking-wide">
+                Harap mematikan atau mengheningkan suara HP Anda selama berada di area masjid • Luruskan dan rapatkan shaf demi kesempurnaan shalat • Jagalah kebersihan dan ketertiban di dalam masjid.
+            </div>
+        </div>
+    </footer>
+
+    <!-- CONTROL PANEL (DURATION OPTIONS 1-2 MIN) -->
+    <div class="fixed top-24 right-6 z-50 bg-slate-900/95 border border-slate-700 p-4 rounded-2xl shadow-2xl backdrop-blur-md max-w-xs text-xs space-y-3">
+        <div class="font-bold text-amber-400 border-b border-slate-800 pb-2 flex justify-between items-center">
+            <span><i class="fa-solid fa-sliders text-emerald-400 mr-1.5"></i> Panel Kontrol Demo</span>
+            <span class="text-[10px] bg-emerald-950 text-emerald-400 border border-emerald-800 px-2 py-0.5 rounded-full font-semibold">Aktif</span>
+        </div>
+
+        <div>
+            <label class="block text-slate-300 mb-1.5 font-semibold">Target Shalat:</label>
+            <select id="select-prayer" onchange="changePrayerTarget()" class="w-full bg-slate-950 border border-slate-700 text-white rounded-lg p-2 text-xs outline-none focus:border-emerald-500">
+                <option value="Subuh">Subuh</option>
+                <option value="Dzuhur" selected>Dzuhur</option>
+                <option value="Ashar">Ashar</option>
+                <option value="Maghrib">Maghrib</option>
+                <option value="Isya">Isya</option>
+            </select>
+        </div>
+
+        <div>
+            <label class="block text-slate-300 mb-1.5 font-semibold">Opsi Durasi Countdown Azan:</label>
+            <div class="grid grid-cols-3 gap-1.5">
+                <button onclick="setDuration(60)" class="duration-btn bg-slate-800 hover:bg-emerald-600 text-slate-200 py-1.5 rounded-lg font-bold text-center border border-slate-700 transition" data-sec="60">
+                    1 Menit
+                </button>
+                <button onclick="setDuration(90)" class="duration-btn bg-slate-800 hover:bg-emerald-600 text-slate-200 py-1.5 rounded-lg font-bold text-center border border-slate-700 transition" data-sec="90">
+                    1.5 Mnt
+                </button>
+                <button onclick="setDuration(120)" class="duration-btn bg-slate-800 hover:bg-emerald-600 text-slate-200 py-1.5 rounded-lg font-bold text-center border border-slate-700 transition" data-sec="120">
+                    2 Menit
+                </button>
+            </div>
+        </div>
+
+        <div class="flex gap-2 pt-1">
+            <button onclick="startAzanTimer()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white py-2 rounded-lg font-bold transition flex items-center justify-center gap-1 shadow-lg">
+                <i class="fa-solid fa-play text-xs"></i> Mulai
+            </button>
+            <button onclick="resetAzanTimer()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-2 rounded-lg font-bold transition border border-slate-700">
+                <i class="fa-solid fa-rotate-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        /* -------------------------------------------------------------
+         * STATE VARIABLES & CONFIGURATION
+         * ------------------------------------------------------------- */
+        let totalSeconds = 60; // Default 1 Menit (60 Detik)
+        let remainingSeconds = 60;
+        let timerInterval = null;
+
+        // DOM Elements
+        const clockDisplay = document.getElementById('realtime-clock');
+        const dateMasehi = document.getElementById('gregorian-date');
+        const dateHijri = document.getElementById('hijri-date');
+        const dayName = document.getElementById('day-name');
+        const countdownDisplay = document.getElementById('countdown-display');
+        const progressBar = document.getElementById('progress-bar');
+        const durationLabel = document.getElementById('duration-label');
+        const durationBtns = document.querySelectorAll('.duration-btn');
+
+        /* -------------------------------------------------------------
+         * REALTIME CLOCK & DATE LOGIC
+         * ------------------------------------------------------------- */
+        function updateRealtimeClock() {
+            const now = new Date();
+            
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            
+            clockDisplay.textContent = `${hours}:${minutes}:${seconds}`;
+
+            const daysIndo = ["Minggu / Ahad", "Senin / Itsnain", "Selasa / Tsulatsa", "Rabu / Arbi'a", "Kamis / Khamis", "Jumat / Jumu'ah", "Sabtu / Sabt"];
+            const monthsIndo = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+            
+            dayName.textContent = daysIndo[now.getDay()];
+            dateMasehi.textContent = `${now.getDate()} ${monthsIndo[now.getMonth()]} ${now.getFullYear()} M`;
+        }
+
+        /* -------------------------------------------------------------
+         * COUNTDOWN TIMER & PROGRESS BAR LOGIC
+         * ------------------------------------------------------------- */
+        function setDuration(seconds) {
+            totalSeconds = seconds;
+            remainingSeconds = seconds;
+            
+            // Highlight active button in panel
+            durationBtns.forEach(btn => {
+                if (parseInt(btn.getAttribute('data-sec')) === seconds) {
+                    btn.classList.add('bg-emerald-600', 'border-emerald-500', 'text-white');
+                    btn.classList.remove('bg-slate-800', 'text-slate-200');
+                } else {
+                    btn.classList.remove('bg-emerald-600', 'border-emerald-500', 'text-white');
+                    btn.classList.add('bg-slate-800', 'text-slate-200');
+                }
+            });
+
+            const minutesFormatted = seconds >= 60 ? `${(seconds / 60).toFixed(seconds % 60 === 0 ? 0 : 1)} Menit` : `${seconds} Detik`;
+            durationLabel.textContent = `Durasi Azan: ${minutesFormatted} (${seconds} Detik)`;
+
+            resetAzanTimer();
+        }
+
+        function updateUI() {
+            const m = Math.floor(remainingSeconds / 60);
+            const s = remainingSeconds % 60;
+            countdownDisplay.textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+
+            // Calculate percentage remaining (100% -> 0%)
+            const percentage = (remainingSeconds / totalSeconds) * 100;
+            progressBar.style.width = `${percentage}%`;
+
+            // Dynamic color transition when countdown is near the end (under 15s)
+            if (remainingSeconds <= 15) {
+                progressBar.className = "progress-fill h-full bg-gradient-to-r from-red-600 to-amber-500 rounded-full w-full shadow-lg";
+            } else {
+                progressBar.className = "progress-fill h-full bg-gradient-to-r from-emerald-500 via-teal-400 to-amber-400 rounded-full w-full shadow-lg";
+            }
+        }
+
+        function startAzanTimer() {
+            clearInterval(timerInterval);
+            
+            timerInterval = setInterval(() => {
+                if (remainingSeconds > 0) {
+                    remainingSeconds--;
+                    updateUI();
+                } else {
+                    clearInterval(timerInterval);
+                    countdownDisplay.textContent = "00:00";
+                    progressBar.style.width = "0%";
+                    playBeepSound();
+                }
+            }, 1000);
+        }
+
+        function resetAzanTimer() {
+            clearInterval(timerInterval);
+            remainingSeconds = totalSeconds;
+            updateUI();
+        }
+
+        function changePrayerTarget() {
+            const selectedPrayer = document.getElementById('select-prayer').value;
+            document.getElementById('current-prayer-name').textContent = selectedPrayer.toUpperCase();
+            resetAzanTimer();
+        }
+
+        function playBeepSound() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc.start();
+                osc.stop(audioCtx.currentTime + 1.2);
+            } catch (e) {
+                console.log("Audio playback restricted by browser context.");
+            }
+        }
+
+        // Initialize App on Load
+        window.onload = function() {
+            updateRealtimeClock();
+            setInterval(updateRealtimeClock, 1000);
+            setDuration(60); // Default 1 Menit
+        };
+    </script>
+</body>
+</html>

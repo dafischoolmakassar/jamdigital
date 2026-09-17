@@ -1,0 +1,11 @@
+# Data runtime -- dibuat otomatis oleh backend, jangan di-commit (beda per instalasi)
+/data/config.json
+/data/admin.json
+
+# Gambar upload dari Admin Panel -- beda per masjid, jangan di-commit
+/uploads/*
+!/uploads/.gitkeep
+
+# OS / editor junk
+.DS_Store
+Thumbs.db

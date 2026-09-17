@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIEW 4 - Menjelang Iqomah | Jasma Digital</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #050b14;
+            color: #ffffff;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        .font-digital {
+            font-family: 'Orbitron', monospace;
+        }
+
+        /* Radial Background Gradient */
+        .bg-gradient-islamic {
+            background: radial-gradient(circle at 50% 40%, #0d3a2c 0%, #06261c 50%, #020a08 100%);
+        }
+
+        /* Ambient Glow Effects */
+        .glow-emerald {
+            box-shadow: 0 0 50px rgba(16, 185, 129, 0.25);
+        }
+        .glow-amber {
+            box-shadow: 0 0 40px rgba(245, 158, 11, 0.3);
+        }
+        .drop-shadow-glow {
+            filter: drop-shadow(0 0 15px rgba(16, 185, 129, 0.5));
+        }
+
+        /* Marquee Animation */
+        @keyframes marquee {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+        .animate-marquee {
+            display: inline-block;
+            white-space: nowrap;
+            animation: marquee 25s linear infinite;
+        }
+
+        /* Pulse Ring Effect */
+        @keyframes ringPulse {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.03); opacity: 1; }
+        }
+        .animate-pulse-ring {
+            animation: ringPulse 3s ease-in-out infinite;
+        }
+
+        /* SVG Circle Progress Smooth Transition */
+        #progress-ring-circle {
+            transition: stroke-dashoffset 0.1s linear, stroke 0.5s ease;
+        }
+    </style>
+</head>
+<body class="h-screen w-screen flex flex-col justify-between p-3 md:p-6 bg-gradient-islamic relative">
+    <div class="fixed top-1.5 left-1.5 z-50 bg-black/70 border border-white/20 text-[9px] font-bold text-white/80 px-2 py-0.5 rounded-full tracking-widest uppercase pointer-events-none">View 4 &middot; Menjelang Iqomah</div>
+
+    <!-- Ambient Subtle Background Patterns -->
+    <div class="absolute inset-0 bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:24px_24px] opacity-20 pointer-events-none"></div>
+
+    <header class="relative z-10 bg-slate-900/80 backdrop-blur-md border border-slate-700/60 rounded-2xl p-4 flex flex-col md:flex-row justify-between items-center shadow-2xl">
+        <!-- Top Accent Line -->
+        <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 via-amber-400 to-teal-500 rounded-t-2xl"></div>
+
+        <!-- Left: Mosque Info -->
+        <div class="flex items-center space-x-4 mb-2 md:mb-0">
+            <div class="w-12 h-12 md:w-14 md:h-14 bg-gradient-to-br from-amber-400 to-amber-600 rounded-xl flex items-center justify-center text-slate-950 text-2xl font-black shadow-lg shadow-amber-500/20">
+                <i class="fa-solid fa-mosque"></i>
+            </div>
+            <div>
+                <h1 class="text-xl md:text-2xl font-black text-amber-400 tracking-wide uppercase">Masjid Agung Al-Ikhlas</h1>
+                <p class="text-xs md:text-sm text-slate-300 font-medium">Jl. Utama No. 123, Cebongan, Yogyakarta</p>
+            </div>
+        </div>
+
+        <!-- Center: Date Information -->
+        <div class="text-center bg-slate-950/60 px-5 py-2 rounded-xl border border-slate-800 my-1 md:my-0">
+            <div id="day-name" class="text-emerald-400 font-bold text-sm md:text-base">Selasa / Tsulatsa</div>
+            <div class="flex items-center justify-center space-x-2 text-xs md:text-sm text-slate-200 font-semibold">
+                <span id="gregorian-date">22 Maret 2026 M</span>
+                <span class="text-amber-400">•</span>
+                <span id="hijri-date" class="text-teal-400">19 Sya'ban 1447 H</span>
+            </div>
+        </div>
+
+        <!-- Right: Current Realtime Clock -->
+        <div class="text-right flex flex-col items-end">
+            <span class="text-[10px] uppercase tracking-widest text-slate-400 font-semibold mb-0.5">Waktu Sekarang</span>
+            <div id="realtime-clock" class="text-3xl md:text-4xl font-extrabold font-digital text-white tracking-widest text-shadow">
+                00:00:00
+            </div>
+        </div>
+    </header>
+
+    <main class="relative z-10 flex-1 flex flex-col items-center justify-center my-4">
+
+        <!-- Top Status Banner -->
+        <div class="mb-4 text-center">
+            <div class="inline-flex items-center space-x-2 bg-emerald-500/10 border border-emerald-500/40 text-emerald-300 px-5 py-1.5 rounded-full text-xs md:text-sm font-bold tracking-wider uppercase backdrop-blur-md">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+                <span id="prayer-target-title">Adzan Dzuhur Telah Selesai</span>
+            </div>
+        </div>
+
+        <!-- CENTERPIECE: Circular Ring & Pie Chart Countdown -->
+        <div class="relative flex items-center justify-center">
+
+            <!-- Glowing Backdrop Blur behind Circle -->
+            <div class="absolute w-72 h-72 md:w-96 md:h-96 rounded-full bg-emerald-500/10 blur-3xl -z-10 animate-pulse-ring"></div>
+
+            <!-- SVG Circular Gauge -->
+            <div class="relative w-72 h-72 md:w-96 md:h-96 flex items-center justify-center">
+                <svg class="w-full h-full transform -rotate-90 drop-shadow-glow" viewBox="0 0 200 200">
+                    <!-- Background Track Circle -->
+                    <circle
+                        cx="100"
+                        cy="100"
+                        r="85"
+                        stroke="rgba(15, 23, 42, 0.8)"
+                        stroke-width="14"
+                        fill="rgba(6, 18, 36, 0.85)"
+                        class="border border-slate-800"
+                    />
+
+                    <!-- Decorative Inner Ring -->
+                    <circle
+                        cx="100"
+                        cy="100"
+                        r="72"
+                        stroke="rgba(255, 255, 255, 0.05)"
+                        stroke-width="2"
+                        fill="none"
+                        stroke-dasharray="4 4"
+                    />
+
+                    <!-- Dynamic Animated Progress Ring (Pie / Donut reduction) -->
+                    <circle
+                        id="progress-ring-circle"
+                        cx="100"
+                        cy="100"
+                        r="85"
+                        stroke="#10b981"
+                        stroke-width="14"
+                        stroke-linecap="round"
+                        fill="none"
+                        stroke-dasharray="534.07"
+                        stroke-dashoffset="0"
+                    />
+                </svg>
+
+                <!-- Center Content Inside Pie Chart -->
+                <div class="absolute inset-0 flex flex-col items-center justify-center text-center p-4">
+                    <span class="text-xs md:text-sm font-bold tracking-widest text-emerald-300 uppercase mb-1">Menuju Iqomah</span>
+
+                    <!-- Countdown Numbers Display -->
+                    <div id="countdown-seconds" class="text-6xl md:text-8xl font-black font-digital text-white tracking-wider leading-none drop-shadow-lg my-1">
+                        60
+                    </div>
+
+                    <span class="text-xs md:text-sm font-extrabold tracking-widest text-slate-400 uppercase">Detik</span>
+
+                    <!-- Target Prayer Time Badge -->
+                    <div class="mt-3 bg-emerald-950/80 border border-emerald-500/40 text-emerald-300 px-3 py-1 rounded-lg text-xs font-mono font-bold">
+                        SHOLAT <span id="prayer-time-val">DZUHUR</span> BERJAMAAH
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Subtitle Info -->
+        <p class="mt-6 text-sm md:text-base text-slate-300 text-center font-medium max-w-md">
+            Menit-menit terakhir sebelum iqomah dikumandangkan. Segera luruskan dan rapatkan shaf.
+        </p>
+    </main>
+
+    <footer class="relative z-10 bg-slate-900/90 border border-slate-700/60 rounded-2xl px-4 py-3 overflow-hidden flex items-center shadow-2xl">
+        <div class="bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 text-xs font-black px-3.5 py-1.5 rounded-xl uppercase tracking-wider mr-3 flex items-center shrink-0 shadow-lg">
+            <i class="fa-solid fa-volume-xmark mr-2 text-sm"></i> Perhatian
+        </div>
+        <div class="overflow-hidden w-full relative">
+            <div id="running-text" class="animate-marquee font-semibold text-sm md:text-base text-amber-200 tracking-wide">
+                Harap mematikan atau mengheningkan suara HP Anda selama berada di area masjid • Luruskan dan rapatkan shaf demi kesempurnaan shalat • Jagalah kebersihan dan ketertiban di dalam masjid.
+            </div>
+        </div>
+    </footer>
+
+    <div class="fixed top-20 right-4 z-50 bg-slate-900/90 border border-slate-700 p-3 rounded-xl shadow-2xl backdrop-blur-md max-w-xs text-xs space-y-2">
+        <div class="font-bold text-amber-400 border-b border-slate-700 pb-1 flex justify-between items-center">
+            <span><i class="fa-solid fa-sliders mr-1"></i> Panel Simulasi Demo</span>
+        </div>
+        <div>
+            <label class="block text-slate-400 mb-1">Sholat setelah Adzan selesai:</label>
+            <select id="select-prayer" onchange="changePrayerTarget()" class="w-full bg-slate-950 border border-slate-700 text-white rounded p-1 text-xs outline-none focus:border-emerald-500">
+                <option value="Dzuhur">Dzuhur</option>
+                <option value="Ashar">Ashar</option>
+                <option value="Maghrib">Maghrib</option>
+                <option value="Isya">Isya</option>
+                <option value="Subuh">Subuh</option>
+            </select>
+        </div>
+        <div class="flex space-x-1 pt-1">
+            <button onclick="startCountdown(60)" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-1 px-2 rounded transition">
+                60s
+            </button>
+            <button onclick="startCountdown(30)" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-bold py-1 px-2 rounded transition">
+                30s
+            </button>
+            <button onclick="startCountdown(10)" class="flex-1 bg-amber-600 hover:bg-amber-500 text-white font-bold py-1 px-2 rounded transition">
+                10s
+            </button>
+        </div>
+    </div>
+
+    <script>
+        /* -------------------------------------------------------------
+         * CIRCULAR PROGRESS RING & COUNTDOWN LOGIC
+         * ------------------------------------------------------------- */
+        const circle = document.getElementById('progress-ring-circle');
+        const secondsDisplay = document.getElementById('countdown-seconds');
+
+        // Circle circumference for r=85: 2 * PI * 85 ≈ 534.07
+        const radius = circle.r.baseVal.value;
+        const circumference = 2 * Math.PI * radius;
+
+        circle.style.strokeDasharray = `${circumference} ${circumference}`;
+        circle.style.strokeDashoffset = 0;
+
+        let totalDuration = 60; // Total countdown seconds
+        let remainingSeconds = 60;
+        let countdownInterval = null;
+
+        // Set Circular Ring Progress Offset
+        function setProgress(percent) {
+            // percent from 1.0 (full) down to 0.0 (empty)
+            const offset = circumference - (percent * circumference);
+            circle.style.strokeDashoffset = offset;
+
+            // Dynamic Color Shift based on remaining time
+            if (percent <= 0.2) {
+                circle.style.stroke = '#ef4444'; // Red (Danger/Final 20%)
+            } else if (percent <= 0.5) {
+                circle.style.stroke = '#f59e0b'; // Amber / Yellow (50%)
+            } else {
+                circle.style.stroke = '#10b981'; // Emerald (Default)
+            }
+        }
+
+        // Start Countdown Timer
+        function startCountdown(durationInSeconds) {
+            clearInterval(countdownInterval);
+            totalDuration = durationInSeconds;
+            remainingSeconds = durationInSeconds;
+
+            updateCountdownUI();
+
+            countdownInterval = setInterval(() => {
+                remainingSeconds--;
+
+                if (remainingSeconds <= 0) {
+                    remainingSeconds = 0;
+                    clearInterval(countdownInterval);
+                    onCountdownComplete();
+                }
+
+                updateCountdownUI();
+            }, 1000);
+        }
+
+        // Update UI Text & Progress Ring
+        function updateCountdownUI() {
+            // Pad single digit numbers with zero
+            secondsDisplay.textContent = String(remainingSeconds).padStart(2, '0');
+
+            // Calculate percentage remaining (1.0 -> 0.0)
+            const percent = remainingSeconds / totalDuration;
+            setProgress(percent);
+        }
+
+        // Event Triggered when Countdown reaches 0 (Iqomah Time)
+        function onCountdownComplete() {
+            secondsDisplay.textContent = "00";
+
+            // Visual Banner Flash Shift
+            const targetTitle = document.getElementById('prayer-target-title');
+            targetTitle.textContent = "IQOMAH! MOHON BERDIRI & RAPIKAN SHAF";
+            targetTitle.parentElement.className = "inline-flex items-center space-x-2 bg-red-600 text-white px-6 py-2 rounded-full text-sm md:text-base font-black tracking-wider uppercase backdrop-blur-md animate-bounce shadow-lg shadow-red-500/50";
+
+            // Audio Beep Sound Effect Simulation (Web Audio API)
+            playBeepSound();
+        }
+
+        // Simple Audio Beep Indicator
+        function playBeepSound() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(880, audioCtx.currentTime); // 880Hz (A5)
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc.start();
+                osc.stop(audioCtx.currentTime + 1.5);
+            } catch(e) {
+                console.log("Audio play blocked by browser policy until user interaction.");
+            }
+        }
+
+        // Change Selected Target Prayer Name
+        function changePrayerTarget() {
+            const pName = document.getElementById('select-prayer').value;
+
+            document.getElementById('prayer-target-title').textContent = `Adzan ${pName} Telah Selesai`;
+            document.getElementById('prayer-time-val').textContent = pName.toUpperCase();
+
+            // Reset Banner Style if was changed by complete
+            const targetTitle = document.getElementById('prayer-target-title');
+            targetTitle.parentElement.className = "inline-flex items-center space-x-2 bg-emerald-500/10 border border-emerald-500/40 text-emerald-300 px-5 py-1.5 rounded-full text-xs md:text-sm font-bold tracking-wider uppercase backdrop-blur-md";
+
+            startCountdown(60);
+        }
+
+        /* -------------------------------------------------------------
+         * REALTIME CLOCK & DATES
+         * ------------------------------------------------------------- */
+        function updateRealtimeClock() {
+            const now = new Date();
+
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+
+            document.getElementById('realtime-clock').textContent = `${hours}:${minutes}:${seconds}`;
+
+            const daysIndo = ["Minggu / Ahad", "Senin / Itsnain", "Selasa / Tsulatsa", "Rabu / Arbi'a", "Kamis / Khamis", "Jumat / Jumu'ah", "Sabtu / Sabt"];
+            const monthsIndo = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+
+            document.getElementById('day-name').textContent = daysIndo[now.getDay()];
+            document.getElementById('gregorian-date').textContent = `${now.getDate()} ${monthsIndo[now.getMonth()]} ${now.getFullYear()} M`;
+        }
+
+        // Initialize App
+        window.onload = function() {
+            updateRealtimeClock();
+            setInterval(updateRealtimeClock, 1000);
+
+            // Start default 60s countdown
+            startCountdown(60);
+        };
+    </script>
+</body>
+</html>

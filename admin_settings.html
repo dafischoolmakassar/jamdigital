@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel | Jasma Digital</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0b0f19;
+            color: #e2e8f0;
+        }
+        .font-poppins { font-family: 'Poppins', sans-serif; }
+
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 8px; }
+
+        .nav-item.active {
+            background-color: rgba(245, 158, 11, 0.12);
+            border-color: rgba(245, 158, 11, 0.4);
+            color: #fbbf24;
+        }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        .field-input {
+            background-color: #0f172a;
+            border: 1px solid #1e293b;
+            color: #f1f5f9;
+            border-radius: 0.5rem;
+            padding: 0.55rem 0.75rem;
+            width: 100%;
+            font-size: 0.875rem;
+            transition: border-color 0.15s ease;
+        }
+        .field-input:focus {
+            outline: none;
+            border-color: #f59e0b;
+        }
+        .field-label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #94a3b8;
+            margin-bottom: 0.35rem;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+        .card {
+            background-color: #111827;
+            border: 1px solid #1e293b;
+            border-radius: 1rem;
+        }
+
+        .theme-option {
+            background-color: #0f172a;
+            border-color: #1e293b;
+        }
+        .theme-option.selected {
+            border-color: #f59e0b;
+            background-color: rgba(245, 158, 11, 0.08);
+        }
+        .theme-option.selected .theme-check {
+            display: inline-block;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            z-index: 100;
+            transform: translateY(120%);
+            transition: transform 0.3s ease;
+        }
+        .toast.show { transform: translateY(0); }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <!-- ============ LOGIN GATE (demo only, ganti dgn auth server-side saat backend siap) ============ -->
+    <div id="login-gate" class="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="card p-8 w-full max-w-sm shadow-2xl">
+            <div class="flex flex-col items-center mb-6">
+                <div class="w-14 h-14 bg-gradient-to-br from-amber-400 to-amber-600 rounded-xl flex items-center justify-center text-slate-950 text-2xl font-black shadow-lg shadow-amber-500/20 mb-3">
+                    <i class="fa-solid fa-mosque"></i>
+                </div>
+                <h1 class="text-lg font-black text-white font-poppins">Jasma Digital</h1>
+                <p class="text-xs text-slate-400 mt-1">Admin Panel &mdash; Login Pengurus Masjid</p>
+            </div>
+            <label class="field-label">Password Admin</label>
+            <input id="login-password" type="password" class="field-input mb-2" placeholder="Masukkan password" onkeydown="if(event.key==='Enter') doLogin()">
+            <p id="login-error" class="text-xs text-red-400 mb-3 hidden">Password salah. Coba lagi.</p>
+            <button onclick="doLogin()" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-2.5 rounded-lg transition">
+                <i class="fa-solid fa-right-to-bracket mr-1.5"></i> Masuk
+            </button>
+            <p class="text-[11px] text-slate-500 mt-4 text-center leading-relaxed">
+                Password default: <span class="font-mono text-slate-400">admin123</span> (dibuat otomatis saat login pertama kali).<br>
+                Segera ganti lewat menu <span class="text-slate-400">Profil Masjid &rarr; Ganti Password</span> setelah masuk.
+            </p>
+        </div>
+    </div>
+
+    <!-- ============ APP SHELL ============ -->
+    <div id="app-shell" class="hidden flex h-screen overflow-hidden">
+
+        <!-- SIDEBAR -->
+        <aside class="w-64 shrink-0 bg-slate-950 border-r border-slate-800 flex flex-col">
+            <div class="p-5 border-b border-slate-800 flex items-center space-x-3">
+                <div class="w-10 h-10 bg-gradient-to-br from-amber-400 to-amber-600 rounded-lg flex items-center justify-center text-slate-950 text-lg font-black shadow-md shadow-amber-500/20">
+                    <i class="fa-solid fa-mosque"></i>
+                </div>
+                <div>
+                    <h1 class="text-sm font-black text-white font-poppins leading-none">Jasma Digital</h1>
+                    <p class="text-[10px] text-amber-400 font-semibold tracking-wide uppercase mt-1">Admin Panel</p>
+                </div>
+            </div>
+
+            <nav class="flex-1 overflow-y-auto p-3 space-y-1">
+                <button class="nav-item active w-full text-left px-3 py-2.5 rounded-lg border border-transparent text-sm font-semibold text-slate-300 hover:bg-slate-900 transition flex items-center space-x-2.5" data-tab="tab-profil" onclick="switchTab('tab-profil', this)">
+                    <i class="fa-solid fa-building-columns w-4"></i><span>Profil Masjid</span>
+                </button>
+                <button class="nav-item w-full text-left px-3 py-2.5 rounded-lg border border-transparent text-sm font-semibold text-slate-300 hover:bg-slate-900 transition flex items-center space-x-2.5" data-tab="tab-jadwal" onclick="switchTab('tab-jadwal', this)">
+                    <i class="fa-solid fa-clock w-4"></i><span>Jadwal Sholat</span>
+                </button>
+                <button class="nav-item w-full text-left px-3 py-2.5 rounded-lg border border-transparent text-sm font-semibold text-slate-300 hover:bg-slate-900 transition flex items-center space-x-2.5" data-tab="tab-timing" onclick="switchTab('tab-timing', this)">
+                    <i class="fa-solid fa-hourglass-half w-4"></i><span>Durasi &amp; Transisi View</span>
+                </button>
+                <button class="nav-item w-full text-left px-3 py-2.5 rounded-lg border border-transparent text-sm font-semibold text-slate-300 hover:bg-slate-900 transition flex items-center space-x-2.5" data-tab="tab-slideshow" onclick="switchTab('tab-slideshow', this)">
+                    <i class="fa-solid fa-images w-4"></i><span>Slideshow Gambar</span>
+                </button>
+                <button class="nav-item w-full text-left px-3 py-2.5 rounded-lg border border-transparent text-sm font-semibold text-slate-300 hover:bg-slate-900 transition flex items-center space-x-2.5" data-tab="tab-preview" onclick="switchTab('tab-preview', this)">
+                    <i class="fa-solid fa-code w-4"></i><span>Preview Config (JSON)</span>
+                </button>
+            </nav>
+
+            <div class="p-3 border-t border-slate-800">
+                <button onclick="doLogout()" class="w-full text-left px-3 py-2.5 rounded-lg text-sm font-semibold text-slate-400 hover:bg-slate-900 hover:text-red-400 transition flex items-center space-x-2.5">
+                    <i class="fa-solid fa-right-from-bracket w-4"></i><span>Keluar</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="flex-1 overflow-y-auto">
+            <header class="sticky top-0 z-10 bg-slate-950/80 backdrop-blur-md border-b border-slate-800 px-8 py-4 flex items-center justify-between">
+                <div>
+                    <h2 id="page-title" class="text-lg font-bold text-white">Profil Masjid</h2>
+                    <p id="page-subtitle" class="text-xs text-slate-400">Nama, alamat, dan teks berjalan yang tampil di layar kiosk</p>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span id="server-status-badge" class="text-[10px] bg-emerald-950 text-emerald-400 border border-emerald-800 px-2.5 py-1 rounded-full font-semibold uppercase tracking-wide">
+                        <i class="fa-solid fa-circle text-[6px] mr-1 align-middle"></i> Tersambung ke Server
+                    </span>
+                </div>
+            </header>
+
+            <div class="p-8 max-w-4xl">
+
+                <!-- ================= TAB: PROFIL MASJID ================= -->
+                <section id="tab-profil" class="tab-panel active space-y-5">
+                    <div class="card p-5">
+                        <h3 class="text-sm font-bold text-white mb-1"><i class="fa-solid fa-palette mr-1.5 text-amber-400"></i> Tema View 1 (Normal)</h3>
+                        <p class="text-xs text-slate-400 mb-4">Pilih tampilan mana yang aktif di layar kiosk. Perubahan langsung berlaku begitu disimpan (kiosk membaca ulang tiap reload).</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <button type="button" id="theme-option-tipe1" onclick="selectTheme('tipe1')" class="theme-option text-left border-2 rounded-xl p-4 transition">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="font-bold text-sm text-white">Tipe 1 &mdash; Navy Klasik</span>
+                                    <i class="fa-solid fa-circle-check theme-check text-emerald-400 hidden"></i>
+                                </div>
+                                <p class="text-xs text-slate-400">Kartu jadwal dengan ikon, jam digital besar tanpa bingkai, tema navy/slate.</p>
+                            </button>
+                            <button type="button" id="theme-option-tipe2" onclick="selectTheme('tipe2')" class="theme-option text-left border-2 rounded-xl p-4 transition">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="font-bold text-sm text-white">Tipe 2 &mdash; Bar Warna</span>
+                                    <i class="fa-solid fa-circle-check theme-check text-emerald-400 hidden"></i>
+                                </div>
+                                <p class="text-xs text-slate-400">Bar jadwal warna solid penuh + baris Imsak, terinspirasi display masjid pada umumnya.</p>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card p-5">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="field-label">Nama Masjid</label>
+                                <input id="cfg-mosque-name" type="text" class="field-input" placeholder="Masjid Agung Al-Ikhlas">
+                            </div>
+                            <div>
+                                <label class="field-label">Alamat</label>
+                                <input id="cfg-mosque-address" type="text" class="field-input" placeholder="Jl. Utama No. 123, Cebongan, Yogyakarta">
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <label class="field-label">Teks Berjalan (Marquee Footer)</label>
+                            <textarea id="cfg-running-text" rows="3" class="field-input resize-none" placeholder="Pisahkan tiap poin dengan tanda •"></textarea>
+                            <p class="text-[11px] text-slate-500 mt-1.5">Contoh: "Harap mematikan HP • Rapikan shaf • Jaga kebersihan masjid"</p>
+                        </div>
+                    </div>
+                    <button onclick="saveConfig('Profil masjid & tema tersimpan')" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-5 py-2.5 rounded-lg transition text-sm">
+                        <i class="fa-solid fa-floppy-disk mr-1.5"></i> Simpan Profil
+                    </button>
+
+                    <div class="card p-5">
+                        <h3 class="text-sm font-bold text-white mb-1"><i class="fa-solid fa-key mr-1.5 text-amber-400"></i> Ganti Password Admin</h3>
+                        <p class="text-xs text-slate-400 mb-4">Segera ganti dari password default setelah login pertama kali.</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="field-label">Password Saat Ini</label>
+                                <input id="cfg-current-password" type="password" class="field-input" placeholder="Password lama">
+                            </div>
+                            <div>
+                                <label class="field-label">Password Baru</label>
+                                <input id="cfg-new-password" type="password" class="field-input" placeholder="Minimal 6 karakter">
+                            </div>
+                        </div>
+                        <button onclick="doChangePassword()" class="mt-4 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold px-5 py-2.5 rounded-lg transition text-sm">
+                            <i class="fa-solid fa-shield-halved mr-1.5"></i> Ganti Password
+                        </button>
+                    </div>
+                </section>
+
+                <!-- ================= TAB: JADWAL SHOLAT ================= -->
+                <section id="tab-jadwal" class="tab-panel space-y-5">
+                    <div class="card p-5 overflow-x-auto">
+                        <h3 class="text-sm font-bold text-white mb-1"><i class="fa-solid fa-calendar-day mr-1.5 text-amber-400"></i> Jadwal Sholat Hari Ini (Manual)</h3>
+                        <p class="text-xs text-slate-400 mb-4">
+                            Ini yang dibaca kiosk sekarang. Isi manual per hari/bulan (mis. dari jadwal Kemenag setempat).
+                            Integrasi auto-fetch API di bawah masih rencana Fase berikutnya — kalau sudah aktif nanti, field ini yang akan terisi otomatis.
+                        </p>
+                        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
+                            <div><label class="field-label">Imsak</label><input id="cfg-jadwal-imsak" type="time" class="field-input"></div>
+                            <div><label class="field-label">Shubuh</label><input id="cfg-jadwal-shubuh" type="time" class="field-input"></div>
+                            <div><label class="field-label">Terbit</label><input id="cfg-jadwal-terbit" type="time" class="field-input"></div>
+                            <div><label class="field-label">Dzuhur</label><input id="cfg-jadwal-dzuhur" type="time" class="field-input"></div>
+                            <div><label class="field-label">Ashar</label><input id="cfg-jadwal-ashar" type="time" class="field-input"></div>
+                            <div><label class="field-label">Maghrib</label><input id="cfg-jadwal-maghrib" type="time" class="field-input"></div>
+                            <div><label class="field-label">Isya</label><input id="cfg-jadwal-isya" type="time" class="field-input"></div>
+                        </div>
+                        <button onclick="saveConfig('Jadwal hari ini tersimpan')" class="mt-4 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-5 py-2.5 rounded-lg transition text-sm">
+                            <i class="fa-solid fa-floppy-disk mr-1.5"></i> Simpan Jadwal Hari Ini
+                        </button>
+                    </div>
+
+                    <div class="card p-5">
+                        <h3 class="text-sm font-bold text-white mb-1"><i class="fa-solid fa-satellite-dish mr-1.5 text-amber-400"></i> Sumber Jadwal (API) &mdash; Rencana Fase Berikutnya</h3>
+                        <p class="text-xs text-slate-400 mb-4">Jadwal diambil otomatis dari Aladhan API berdasarkan koordinat masjid. Nilai di bawah dipakai kiosk untuk fetch harian.</p>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="field-label">Latitude</label>
+                                <input id="cfg-lat" type="number" step="0.0001" class="field-input" placeholder="-7.7326">
+                            </div>
+                            <div>
+                                <label class="field-label">Longitude</label>
+                                <input id="cfg-lng" type="number" step="0.0001" class="field-input" placeholder="110.3591">
+                            </div>
+                            <div>
+                                <label class="field-label">Metode Perhitungan</label>
+                                <select id="cfg-method" class="field-input">
+                                    <option value="20">20 &mdash; Kemenag RI (pendekatan)</option>
+                                    <option value="11">11 &mdash; Majlis Ugama Islam Singapura</option>
+                                    <option value="3">3 &mdash; Muslim World League</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card p-5">
+                        <h3 class="text-sm font-bold text-white mb-1"><i class="fa-solid fa-sliders mr-1.5 text-amber-400"></i> Koreksi Manual (Ihtiyat)</h3>
+                        <p class="text-xs text-slate-400 mb-4">Selisih menit yang ditambahkan/dikurangi dari hasil API, supaya cocok dengan jadwal resmi Kemenag setempat.</p>
+                        <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+                            <div>
+                                <label class="field-label">Shubuh</label>
+                                <input id="cfg-corr-shubuh" type="number" class="field-input" value="2">
+                            </div>
+                            <div>
+                                <label class="field-label">Dzuhur</label>
+                                <input id="cfg-corr-dzuhur" type="number" class="field-input" value="1">
+                            </div>
+                            <div>
+                                <label class="field-label">Ashar</label>
+                                <input id="cfg-corr-ashar" type="number" class="field-input" value="1">
+                            </div>
+                            <div>
+                                <label class="field-label">Maghrib</label>
+                                <input id="cfg-corr-maghrib" type="number" class="field-input" value="0">
+                            </div>
+                            <div>
+                                <label class="field-label">Isya</label>
+                                <input id="cfg-corr-isya" type="number" class="field-input" value="1">
+                            </div>
+                        </div>
+                        <p class="text-[11px] text-slate-500 mt-3">Satuan: menit. Boleh negatif (mis. -1) kalau hasil API lebih lambat dari jadwal resmi.</p>
+                    </div>
+                    <button onclick="saveConfig('Pengaturan API & koreksi tersimpan')" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-5 py-2.5 rounded-lg transition text-sm">
+                        <i class="fa-solid fa-floppy-disk mr-1.5"></i> Simpan API &amp; Koreksi
+                    </button>
+                </section>
+
+                <!-- ================= TAB: DURASI & TRANSISI VIEW ================= -->
+                <section id="tab-timing" class="tab-panel space-y-5">
+                    <div class="card p-5">
+                        <h3 class="text-sm font-bold text-white mb-1"><i class="fa-solid fa-rotate mr-1.5 text-amber-400"></i> Sub-Rotasi Mode Normal (View 1), detik</h3>
+                        <p class="text-xs text-slate-400 mb-4">Selama bukan waktu sholat, View 1 berputar otomatis: Dashboard &rarr; Foto Acak &rarr; Jam Analog &rarr; ulang.</p>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="field-label">Dashboard</label>
+                                <input id="cfg-carousel-dashboard" type="number" class="field-input" value="30">
+                            </div>
+                            <div>
+                                <label class="field-label">Foto Acak</label>
+                                <input id="cfg-carousel-photo" type="number" class="field-input" value="30">
+                            </div>
+                            <div>
+                                <label class="field-label">Jam Analog</label>
+                                <input id="cfg-carousel-clock" type="number" class="field-input" value="30">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card p-5">
+                        <h3 class="text-sm font-bold text-white mb-1"><i class="fa-solid fa-forward mr-1.5 text-amber-400"></i> Menjelang Adzan (View 2)</h3>
+                        <p class="text-xs text-slate-400 mb-4">Berapa menit sebelum adzan, layar pindah ke view countdown.</p>
+                        <div class="max-w-xs">
+                            <label class="field-label">Mulai Menjelang Adzan (menit sebelum)</label>
+                            <input id="cfg-pre-adzan" type="number" class="field-input" value="10">
+                        </div>
+                    </div>
+
+                    <div class="card p-5 overflow-x-auto">
+                        <h3 class="text-sm font-bold text-white mb-1"><i class="fa-solid fa-volume-high mr-1.5 text-amber-400"></i> Durasi Adzan (View 3), menit</h3>
+                        <p class="text-xs text-slate-400 mb-4">Lama layar tetap di view "Adzan Berkumandang" sebelum pindah ke "Menjelang Iqomah".</p>
+                        <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+                            <div><label class="field-label">Shubuh</label><input id="cfg-azan-shubuh" type="number" class="field-input" value="4"></div>
+                            <div><label class="field-label">Dzuhur</label><input id="cfg-azan-dzuhur" type="number" class="field-input" value="3"></div>
+                            <div><label class="field-label">Ashar</label><input id="cfg-azan-ashar" type="number" class="field-input" value="3"></div>
+                            <div><label class="field-label">Maghrib</label><input id="cfg-azan-maghrib" type="number" class="field-input" value="3"></div>
+                            <div><label class="field-label">Isya</label><input id="cfg-azan-isya" type="number" class="field-input" value="3"></div>
+                        </div>
+                    </div>
+
+                    <div class="card p-5 overflow-x-auto">
+                        <h3 class="text-sm font-bold text-white mb-1"><i class="fa-solid fa-person-praying mr-1.5 text-amber-400"></i> Jeda Menuju Iqomah (View 4), menit</h3>
+                        <p class="text-xs text-slate-400 mb-4">Dihitung sejak adzan selesai berkumandang.</p>
+                        <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+                            <div><label class="field-label">Shubuh</label><input id="cfg-iqomah-shubuh" type="number" class="field-input" value="15"></div>
+                            <div><label class="field-label">Dzuhur</label><input id="cfg-iqomah-dzuhur" type="number" class="field-input" value="10"></div>
+                            <div><label class="field-label">Ashar</label><input id="cfg-iqomah-ashar" type="number" class="field-input" value="10"></div>
+                            <div><label class="field-label">Maghrib</label><input id="cfg-iqomah-maghrib" type="number" class="field-input" value="5"></div>
+                            <div><label class="field-label">Isya</label><input id="cfg-iqomah-isya" type="number" class="field-input" value="10"></div>
+                        </div>
+                    </div>
+
+                    <div class="card p-5 overflow-x-auto">
+                        <h3 class="text-sm font-bold text-white mb-1"><i class="fa-solid fa-mosque mr-1.5 text-amber-400"></i> Estimasi Lama Sholat (View 5), menit</h3>
+                        <p class="text-xs text-slate-400 mb-4">Dihitung sejak iqomah, dipakai untuk auto-kembali ke View 1 (Normal).</p>
+                        <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+                            <div><label class="field-label">Shubuh</label><input id="cfg-sholat-shubuh" type="number" class="field-input" value="12"></div>
+                            <div><label class="field-label">Dzuhur</label><input id="cfg-sholat-dzuhur" type="number" class="field-input" value="10"></div>
+                            <div><label class="field-label">Ashar</label><input id="cfg-sholat-ashar" type="number" class="field-input" value="10"></div>
+                            <div><label class="field-label">Maghrib</label><input id="cfg-sholat-maghrib" type="number" class="field-input" value="8"></div>
+                            <div><label class="field-label">Isya</label><input id="cfg-sholat-isya" type="number" class="field-input" value="12"></div>
+                        </div>
+                    </div>
+
+                    <div class="card p-5">
+                        <h3 class="text-sm font-bold text-white mb-1"><i class="fa-solid fa-book-quran mr-1.5 text-amber-400"></i> Alur Khusus Jumat</h3>
+                        <p class="text-xs text-slate-400 mb-4">Dzuhur hari Jumat diganti alur Jumatan (khutbah lebih panjang).</p>
+                        <div class="grid grid-cols-2 gap-4 max-w-md">
+                            <div>
+                                <label class="field-label">Durasi Khutbah (menit)</label>
+                                <input id="cfg-jumat-khutbah" type="number" class="field-input" value="35">
+                            </div>
+                            <div>
+                                <label class="field-label">Durasi Sholat Jumat (menit)</label>
+                                <input id="cfg-jumat-sholat" type="number" class="field-input" value="10">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button onclick="saveConfig('Pengaturan durasi & transisi tersimpan')" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-5 py-2.5 rounded-lg transition text-sm">
+                        <i class="fa-solid fa-floppy-disk mr-1.5"></i> Simpan Durasi
+                    </button>
+                </section>
+
+                <!-- ================= TAB: SLIDESHOW GAMBAR ================= -->
+                <section id="tab-slideshow" class="tab-panel space-y-5">
+                    <div class="card p-5">
+                        <h3 class="text-sm font-bold text-white mb-1"><i class="fa-solid fa-upload mr-1.5 text-amber-400"></i> Tambah Gambar</h3>
+                        <p class="text-xs text-slate-400 mb-4">
+                            File diupload langsung ke server (folder <code class="text-amber-300">uploads/</code>), maksimal 8MB, format JPG/PNG/WEBP.
+                        </p>
+                        <div class="flex flex-col md:flex-row gap-3">
+                            <input id="upload-caption" type="text" class="field-input md:max-w-xs" placeholder="Caption gambar, mis. Masjid Nabawi">
+                            <input id="upload-file" type="file" accept="image/*" class="field-input md:max-w-xs">
+                            <button onclick="addSlideImage()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-4 py-2.5 rounded-lg transition text-sm shrink-0">
+                                <i class="fa-solid fa-plus mr-1.5"></i> Tambah ke Slideshow
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card p-5">
+                        <h3 class="text-sm font-bold text-white mb-4"><i class="fa-solid fa-list-ol mr-1.5 text-amber-400"></i> Urutan Slideshow</h3>
+                        <div id="slide-list" class="space-y-2"></div>
+                        <p id="slide-empty" class="text-xs text-slate-500 hidden">Belum ada gambar. Tambahkan gambar di atas.</p>
+                    </div>
+                </section>
+
+                <!-- ================= TAB: PREVIEW CONFIG ================= -->
+                <section id="tab-preview" class="tab-panel space-y-5">
+                    <div class="card p-5">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-sm font-bold text-white"><i class="fa-solid fa-code mr-1.5 text-amber-400"></i> Config Gabungan (untuk kiosk)</h3>
+                            <button onclick="refreshPreview()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg font-semibold transition">
+                                <i class="fa-solid fa-rotate-right mr-1"></i> Refresh
+                            </button>
+                        </div>
+                        <p class="text-xs text-slate-400 mb-3">
+                            Ini isi <code class="text-amber-300">data/config.json</code> di server saat ini &mdash; sumber data yang dibaca <code class="text-amber-300">view1.php</code> setiap kiosk reload.
+                        </p>
+                        <pre id="config-preview" class="bg-black/50 border border-slate-800 rounded-lg p-4 text-xs text-emerald-300 overflow-x-auto max-h-[28rem] overflow-y-auto"></pre>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="toast card px-4 py-3 shadow-2xl border-emerald-700/50 flex items-center space-x-2 text-sm font-semibold text-emerald-300">
+        <i class="fa-solid fa-circle-check"></i>
+        <span id="toast-text">Tersimpan</span>
+    </div>
+
+    <script>
+        let config = null;
+
+        /* -------------------------------------------------------------
+         * KOMUNIKASI KE BACKEND (api/*.php)
+         * ------------------------------------------------------------- */
+        async function apiGet(path) {
+            const res = await fetch(path);
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok) throw new Error(data.error || 'Gagal mengambil data dari server');
+            return data;
+        }
+
+        async function apiPost(path, body) {
+            const res = await fetch(path, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok) throw new Error(data.error || 'Gagal menyimpan ke server');
+            return data;
+        }
+
+        async function loadConfig() {
+            config = await apiGet('api/config.php');
+        }
+
+        async function persistConfig() {
+            await apiPost('api/config.php', config);
+        }
+
+        /* -------------------------------------------------------------
+         * LOGIN GATE (session PHP asli lewat api/login.php)
+         * ------------------------------------------------------------- */
+        async function doLogin() {
+            const pass = document.getElementById('login-password').value;
+            document.getElementById('login-error').classList.add('hidden');
+            try {
+                const res = await fetch('api/login.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: pass })
+                });
+                const data = await res.json();
+                if (!res.ok || !data.ok) throw new Error(data.error || 'Password salah');
+
+                await loadConfig();
+                document.getElementById('login-gate').classList.add('hidden');
+                document.getElementById('app-shell').classList.remove('hidden');
+                populateForm();
+            } catch (err) {
+                document.getElementById('login-error').textContent = err.message;
+                document.getElementById('login-error').classList.remove('hidden');
+            }
+        }
+
+        async function doLogout() {
+            try { await fetch('api/logout.php', { method: 'POST' }); } catch (e) { /* abaikan, tetap reload */ }
+            location.reload();
+        }
+
+        async function doChangePassword() {
+            const currentPassword = document.getElementById('cfg-current-password').value;
+            const newPassword = document.getElementById('cfg-new-password').value;
+            try {
+                await apiPost('api/change_password.php', { currentPassword, newPassword });
+                document.getElementById('cfg-current-password').value = '';
+                document.getElementById('cfg-new-password').value = '';
+                showToast('Password berhasil diganti');
+            } catch (err) {
+                showToast(err.message, true);
+            }
+        }
+
+        /* -------------------------------------------------------------
+         * TAB NAVIGATION
+         * ------------------------------------------------------------- */
+        const tabMeta = {
+            'tab-profil': { title: 'Profil Masjid', subtitle: 'Nama, alamat, dan teks berjalan yang tampil di layar kiosk' },
+            'tab-jadwal': { title: 'Jadwal Sholat', subtitle: 'Sumber API dan koreksi manual jadwal sholat' },
+            'tab-timing': { title: 'Durasi & Transisi View', subtitle: 'Atur kapan tiap view (2–5) muncul dan berapa lama' },
+            'tab-slideshow': { title: 'Slideshow Gambar', subtitle: 'Kelola gambar yang tampil fullscreen di View 1 (Normal)' },
+            'tab-preview': { title: 'Preview Config (JSON)', subtitle: 'Bentuk data akhir yang dibaca oleh kiosk' }
+        };
+
+        function switchTab(tabId, btnEl) {
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            btnEl.classList.add('active');
+            document.getElementById('page-title').textContent = tabMeta[tabId].title;
+            document.getElementById('page-subtitle').textContent = tabMeta[tabId].subtitle;
+            if (tabId === 'tab-preview') refreshPreview();
+        }
+
+        /* -------------------------------------------------------------
+         * FORM <-> CONFIG BINDING
+         * ------------------------------------------------------------- */
+        function populateForm() {
+            selectTheme(config.activeTheme || 'tipe1', false);
+
+            document.getElementById('cfg-mosque-name').value = config.mosque.name;
+            document.getElementById('cfg-mosque-address').value = config.mosque.address;
+            document.getElementById('cfg-running-text').value = config.mosque.runningText;
+
+            const ps = config.prayerSchedule || {};
+            ['imsak','shubuh','terbit','dzuhur','ashar','maghrib','isya'].forEach(k => {
+                const el = document.getElementById(`cfg-jadwal-${k}`);
+                if (el) el.value = ps[k] || '';
+            });
+
+            document.getElementById('cfg-lat').value = config.prayerApi.lat;
+            document.getElementById('cfg-lng').value = config.prayerApi.lng;
+            document.getElementById('cfg-method').value = config.prayerApi.method;
+            document.getElementById('cfg-corr-shubuh').value = config.prayerApi.correctionMinutes.shubuh;
+            document.getElementById('cfg-corr-dzuhur').value = config.prayerApi.correctionMinutes.dzuhur;
+            document.getElementById('cfg-corr-ashar').value = config.prayerApi.correctionMinutes.ashar;
+            document.getElementById('cfg-corr-maghrib').value = config.prayerApi.correctionMinutes.maghrib;
+            document.getElementById('cfg-corr-isya').value = config.prayerApi.correctionMinutes.isya;
+
+            document.getElementById('cfg-carousel-dashboard').value = config.normalCarousel.dashboardSeconds;
+            document.getElementById('cfg-carousel-photo').value = config.normalCarousel.photoSeconds;
+            document.getElementById('cfg-carousel-clock').value = config.normalCarousel.analogClockSeconds;
+
+            document.getElementById('cfg-pre-adzan').value = config.timing.preAdzanMinutes;
+            ['shubuh','dzuhur','ashar','maghrib','isya'].forEach(k => {
+                document.getElementById(`cfg-azan-${k}`).value = config.timing.azanDurationMinutes[k];
+                document.getElementById(`cfg-iqomah-${k}`).value = config.timing.iqomahOffsetMinutes[k];
+                document.getElementById(`cfg-sholat-${k}`).value = config.timing.sholatDurationMinutes[k];
+            });
+            document.getElementById('cfg-jumat-khutbah').value = config.timing.jumat.khutbahDurationMinutes;
+            document.getElementById('cfg-jumat-sholat').value = config.timing.jumat.sholatDurationMinutes;
+
+            renderSlideList();
+        }
+
+        function readFormIntoConfig() {
+            config.mosque.name = document.getElementById('cfg-mosque-name').value;
+            config.mosque.address = document.getElementById('cfg-mosque-address').value;
+            config.mosque.runningText = document.getElementById('cfg-running-text').value;
+
+            config.prayerSchedule = config.prayerSchedule || {};
+            ['imsak','shubuh','terbit','dzuhur','ashar','maghrib','isya'].forEach(k => {
+                const el = document.getElementById(`cfg-jadwal-${k}`);
+                if (el && el.value) config.prayerSchedule[k] = el.value;
+            });
+
+            config.prayerApi.lat = parseFloat(document.getElementById('cfg-lat').value) || 0;
+            config.prayerApi.lng = parseFloat(document.getElementById('cfg-lng').value) || 0;
+            config.prayerApi.method = parseInt(document.getElementById('cfg-method').value, 10);
+            config.prayerApi.correctionMinutes = {
+                shubuh: parseInt(document.getElementById('cfg-corr-shubuh').value, 10) || 0,
+                dzuhur: parseInt(document.getElementById('cfg-corr-dzuhur').value, 10) || 0,
+                ashar: parseInt(document.getElementById('cfg-corr-ashar').value, 10) || 0,
+                maghrib: parseInt(document.getElementById('cfg-corr-maghrib').value, 10) || 0,
+                isya: parseInt(document.getElementById('cfg-corr-isya').value, 10) || 0
+            };
+
+            config.normalCarousel.dashboardSeconds = parseInt(document.getElementById('cfg-carousel-dashboard').value, 10) || 0;
+            config.normalCarousel.photoSeconds = parseInt(document.getElementById('cfg-carousel-photo').value, 10) || 0;
+            config.normalCarousel.analogClockSeconds = parseInt(document.getElementById('cfg-carousel-clock').value, 10) || 0;
+
+            config.timing.preAdzanMinutes = parseInt(document.getElementById('cfg-pre-adzan').value, 10) || 0;
+            ['shubuh','dzuhur','ashar','maghrib','isya'].forEach(k => {
+                config.timing.azanDurationMinutes[k] = parseInt(document.getElementById(`cfg-azan-${k}`).value, 10) || 0;
+                config.timing.iqomahOffsetMinutes[k] = parseInt(document.getElementById(`cfg-iqomah-${k}`).value, 10) || 0;
+                config.timing.sholatDurationMinutes[k] = parseInt(document.getElementById(`cfg-sholat-${k}`).value, 10) || 0;
+            });
+            config.timing.jumat.khutbahDurationMinutes = parseInt(document.getElementById('cfg-jumat-khutbah').value, 10) || 0;
+            config.timing.jumat.sholatDurationMinutes = parseInt(document.getElementById('cfg-jumat-sholat').value, 10) || 0;
+        }
+
+        async function saveConfig(message) {
+            readFormIntoConfig();
+            try {
+                await persistConfig();
+                showToast(message || 'Tersimpan');
+            } catch (err) {
+                showToast(err.message, true);
+            }
+        }
+
+        /* -------------------------------------------------------------
+         * TEMA VIEW 1 (Tipe 1 / Tipe 2)
+         * ------------------------------------------------------------- */
+        function selectTheme(theme, markDirty = true) {
+            config.activeTheme = theme;
+            document.getElementById('theme-option-tipe1').classList.toggle('selected', theme === 'tipe1');
+            document.getElementById('theme-option-tipe2').classList.toggle('selected', theme === 'tipe2');
+            if (markDirty) showToast(`Tema dipilih: ${theme === 'tipe2' ? 'Tipe 2' : 'Tipe 1'} -- klik "Simpan Profil" untuk menerapkan`);
+        }
+
+        /* -------------------------------------------------------------
+         * SLIDESHOW MANAGER (upload asli ke server via api/upload.php)
+         * ------------------------------------------------------------- */
+        function renderSlideList() {
+            const list = document.getElementById('slide-list');
+            const empty = document.getElementById('slide-empty');
+            list.innerHTML = '';
+
+            if (config.slideImages.length === 0) {
+                empty.classList.remove('hidden');
+                return;
+            }
+            empty.classList.add('hidden');
+
+            config.slideImages.forEach((img, index) => {
+                const row = document.createElement('div');
+                row.className = 'flex items-center gap-3 bg-slate-950 border border-slate-800 rounded-lg p-2.5';
+                row.innerHTML = `
+                    <img src="${img.url}" class="w-16 h-12 object-cover rounded-md border border-slate-800" onerror="this.src='https://placehold.co/160x120/0f172a/64748b?text=Gambar'">
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-semibold text-slate-200 truncate">${img.caption || '(tanpa caption)'}</p>
+                        <p class="text-[10px] text-slate-500 truncate">${img.url.startsWith('uploads/') ? 'Upload sendiri &middot; ' + img.url : img.url}</p>
+                    </div>
+                    <div class="flex items-center gap-1 shrink-0">
+                        <button onclick="moveSlide(${index}, -1)" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center" title="Naikkan urutan"><i class="fa-solid fa-arrow-up text-xs"></i></button>
+                        <button onclick="moveSlide(${index}, 1)" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center" title="Turunkan urutan"><i class="fa-solid fa-arrow-down text-xs"></i></button>
+                        <button onclick="removeSlide(${index})" class="w-8 h-8 rounded-lg bg-red-950 hover:bg-red-900 text-red-400 flex items-center justify-center" title="Hapus"><i class="fa-solid fa-trash text-xs"></i></button>
+                    </div>
+                `;
+                list.appendChild(row);
+            });
+        }
+
+        async function addSlideImage() {
+            const fileInput = document.getElementById('upload-file');
+            const caption = document.getElementById('upload-caption').value.trim() || 'Tanpa caption';
+            const file = fileInput.files[0];
+
+            if (!file) {
+                showToast('Pilih file gambar dulu', true);
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('image', file);
+            formData.append('caption', caption);
+
+            try {
+                const res = await fetch('api/upload.php', { method: 'POST', body: formData });
+                const data = await res.json();
+                if (!res.ok || !data.ok) throw new Error(data.error || 'Upload gagal');
+
+                config.slideImages.push({ url: data.url, caption: data.caption });
+                await persistConfig();
+                renderSlideList();
+                document.getElementById('upload-caption').value = '';
+                fileInput.value = '';
+                showToast('Gambar diupload & ditambahkan ke slideshow');
+            } catch (err) {
+                showToast(err.message, true);
+            }
+        }
+
+        async function moveSlide(index, direction) {
+            const newIndex = index + direction;
+            if (newIndex < 0 || newIndex >= config.slideImages.length) return;
+            const temp = config.slideImages[index];
+            config.slideImages[index] = config.slideImages[newIndex];
+            config.slideImages[newIndex] = temp;
+            renderSlideList();
+            try { await persistConfig(); } catch (err) { showToast(err.message, true); }
+        }
+
+        async function removeSlide(index) {
+            config.slideImages.splice(index, 1);
+            renderSlideList();
+            try {
+                await persistConfig();
+                showToast('Gambar dihapus');
+            } catch (err) {
+                showToast(err.message, true);
+            }
+        }
+
+        /* -------------------------------------------------------------
+         * CONFIG PREVIEW
+         * ------------------------------------------------------------- */
+        function refreshPreview() {
+            readFormIntoConfig();
+            document.getElementById('config-preview').textContent = JSON.stringify(config, null, 2);
+        }
+
+        /* -------------------------------------------------------------
+         * TOAST
+         * ------------------------------------------------------------- */
+        let toastTimeout = null;
+        function showToast(message, isError) {
+            const toast = document.getElementById('toast');
+            const text = document.getElementById('toast-text');
+            text.textContent = message;
+            toast.classList.toggle('border-emerald-700/50', !isError);
+            toast.classList.toggle('text-emerald-300', !isError);
+            toast.classList.toggle('border-red-700/50', !!isError);
+            toast.classList.toggle('text-red-300', !!isError);
+            toast.querySelector('i').className = isError ? 'fa-solid fa-circle-exclamation' : 'fa-solid fa-circle-check';
+            toast.classList.add('show');
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => toast.classList.remove('show'), 2500);
+        }
+
+        /* -------------------------------------------------------------
+         * INIT
+         * ------------------------------------------------------------- */
+        window.onload = async function() {
+            try {
+                const session = await apiGet('api/session.php');
+                if (session.loggedIn) {
+                    await loadConfig();
+                    document.getElementById('login-gate').classList.add('hidden');
+                    document.getElementById('app-shell').classList.remove('hidden');
+                    populateForm();
+                }
+            } catch (err) {
+                // Server belum bisa dihubungi (mis. dibuka sbg file:// langsung tanpa PHP) -- tetap tampilkan login gate
+                console.warn('Tidak bisa cek sesi ke server:', err.message);
+            }
+        };
+    </script>
+</body>
+</html>

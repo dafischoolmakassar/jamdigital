@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIEW 1 - Normal | Jasma Digital</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Inter & Poppins (untuk angka jam waktu sholat) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Poppins:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0b0f19;
+            color: #ffffff;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        /* Marquee Custom Animation */
+        @keyframes marquee {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+        .animate-marquee {
+            display: inline-block;
+            white-space: nowrap;
+            animation: marquee 25s linear infinite;
+        }
+
+        /* Fade Animation for Slideshow */
+        .fade-slide {
+            transition: opacity 1s ease-in-out;
+        }
+
+        .font-poppins {
+            font-family: 'Poppins', sans-serif;
+        }
+    </style>
+</head>
+<body class="h-screen w-screen relative bg-slate-950 overflow-hidden">
+    <div class="fixed top-1.5 left-1.5 z-50 bg-black/70 border border-white/20 text-[9px] font-bold text-white/80 px-2 py-0.5 rounded-full tracking-widest uppercase pointer-events-none">View 1 &middot; Normal</div>
+
+    <!-- ======================================================================
+         SUB-SCREEN A: DASHBOARD (default) -- header, slideshow, jadwal, footer
+         Berputar bersama Sub-Screen B (Foto Acak) & C (Jam Analog) di bawah,
+         hanya aktif selama mode NORMAL (bukan menjelang/selama sholat).
+         ====================================================================== -->
+    <div id="screen-dashboard" class="absolute inset-0 h-full w-full flex flex-col justify-between p-2 md:p-4 transition-opacity duration-1000">
+
+    <!-- HEADER -->
+    <header class="bg-slate-900/90 border border-slate-800 rounded-xl p-3 md:p-4 flex flex-col md:flex-row justify-between items-center shadow-2xl relative overflow-hidden">
+        <!-- Accent Line -->
+        <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 via-emerald-500 to-cyan-500"></div>
+
+        <!-- Left Header: Mosque Details -->
+        <div class="flex items-center space-x-4 mb-2 md:mb-0">
+            <div class="w-12 h-12 md:w-14 md:h-14 bg-amber-500/20 border border-amber-500/50 rounded-full flex items-center justify-center text-amber-400 text-2xl shadow-inner">
+                <i class="fa-solid font-bold fa-mosque"></i>
+            </div>
+            <div>
+                <div class="flex items-center space-x-2">
+                    <h1 id="mosque-name" class="text-xl md:text-2xl font-black text-amber-400 tracking-wider uppercase">Jasma Digital</h1>
+                    <span class="text-xs bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-full font-semibold">PRO</span>
+                </div>
+                <p id="mosque-address" class="text-xs md:text-sm text-slate-300 font-medium">Cebongan Tlogoadi Mlati DI Yogyakarta</p>
+                <p class="text-[11px] text-amber-300/80 tracking-wide font-mono">https://jasmadigital.com</p>
+            </div>
+        </div>
+
+        <!-- Center Header: Day & Dates -->
+        <div class="text-center my-1 md:my-0 px-4 py-1.5 bg-slate-800/60 rounded-lg border border-slate-700/50">
+            <div id="day-name" class="text-amber-400 font-bold text-base md:text-lg">Selasa / Tsulatsa</div>
+            <div class="flex items-center justify-center space-x-3 text-xs md:text-sm font-semibold text-slate-200">
+                <span id="gregorian-date">22 Maret 2026 M</span>
+                <span class="text-amber-500">•</span>
+                <span id="hijri-date" class="text-emerald-400">19 Sya'ban 1447 H</span>
+            </div>
+        </div>
+
+        <!-- Right Header: Main Digital Clock (Diperbesar & Tanpa Badge/Box) -->
+        <div class="text-right flex flex-col items-end justify-center">
+            <div id="realtime-clock" class="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black font-mono text-slate-100 tracking-wider text-shadow-lg drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)] leading-none">
+                00:00:00
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT BODY (Slideshow & Prayer Schedule) -->
+    <main class="grid grid-cols-1 lg:grid-cols-12 gap-3 md:gap-4 my-2 md:my-3 flex-1 min-h-0">
+
+        <!-- Left/Center Side: Image Slider Carousel (8 Cols on LG) -->
+        <section class="lg:col-span-8 relative rounded-xl overflow-hidden border border-slate-800 bg-slate-900 shadow-2xl flex flex-col">
+            <!-- Slides Container -->
+            <div id="slideshow-container" class="relative w-full h-full min-h-[250px] bg-slate-950">
+                <!-- Dynamic Image Slides injected via JS -->
+            </div>
+
+            <!-- Overlay Badge / Countdown Banner (Bottom Center of Image) -->
+            <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-20 w-11/12 max-w-lg">
+                <div class="bg-black/85 backdrop-blur-md border border-amber-500/40 rounded-full px-5 py-2.5 shadow-2xl flex items-center justify-between text-center border-l-4 border-l-amber-500">
+                    <div class="flex items-center space-x-2">
+                        <span class="relative flex h-3 w-3">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-3 w-3 bg-amber-500"></span>
+                        </span>
+                        <span id="countdown-label" class="text-xs md:text-sm font-bold uppercase tracking-wider text-amber-300">Countdown</span>
+                    </div>
+                    <div id="countdown-timer" class="text-sm md:text-lg font-black font-mono text-white tracking-widest bg-amber-950/60 px-3 py-0.5 rounded-full border border-amber-500/30">
+                        00:00:00
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slider Indicators -->
+            <div id="slider-dots" class="absolute top-3 right-3 z-20 flex space-x-1.5 bg-black/50 p-1.5 rounded-full border border-white/10">
+                <!-- Dots injected via JS -->
+            </div>
+        </section>
+
+        <!-- Right Side: Prayer Schedule (4 Cols on LG) -->
+        <section class="lg:col-span-4 flex flex-col justify-between space-y-2 h-full">
+            <div id="prayer-list" class="grid grid-cols-2 lg:grid-cols-1 gap-2 h-full">
+                
+                <!-- Shubuh -->
+                <div id="card-shubuh" class="prayer-card bg-blue-950/40 border border-blue-800/40 rounded-xl p-3 flex justify-between items-center transition-all duration-300">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 rounded-lg bg-blue-900/50 border border-blue-500/30 flex items-center justify-center text-blue-400 text-sm">
+                            <i class="fa-solid fa-cloud-moon"></i>
+                        </div>
+                        <span class="font-bold text-sm md:text-base text-slate-200">Shubuh</span>
+                    </div>
+                    <span id="time-shubuh" class="font-extrabold text-3xl md:text-5xl font-poppins text-blue-300 tracking-wide">04:28</span>
+                </div>
+
+                <!-- Terbit / Syuruq -->
+                <div id="card-terbit" class="prayer-card bg-red-950/40 border border-red-800/40 rounded-xl p-3 flex justify-between items-center transition-all duration-300">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 rounded-lg bg-red-900/50 border border-red-500/30 flex items-center justify-center text-red-400 text-sm">
+                            <i class="fa-solid fa-sun"></i>
+                        </div>
+                        <span class="font-bold text-sm md:text-base text-slate-200">Terbit</span>
+                    </div>
+                    <span id="time-terbit" class="font-extrabold text-3xl md:text-5xl font-poppins text-red-300 tracking-wide">05:39</span>
+                </div>
+
+                <!-- Dzuhur -->
+                <div id="card-dzuhur" class="prayer-card bg-amber-950/40 border border-amber-800/40 rounded-xl p-3 flex justify-between items-center transition-all duration-300">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 rounded-lg bg-amber-900/50 border border-amber-500/30 flex items-center justify-center text-amber-400 text-sm">
+                            <i class="fa-solid fa-solar-panel"></i>
+                        </div>
+                        <span class="font-bold text-sm md:text-base text-slate-200">Dzuhur</span>
+                    </div>
+                    <span id="time-dzuhur" class="font-extrabold text-3xl md:text-5xl font-poppins text-amber-300 tracking-wide">11:49</span>
+                </div>
+
+                <!-- Ashar -->
+                <div id="card-ashar" class="prayer-card bg-orange-950/40 border border-orange-800/40 rounded-xl p-3 flex justify-between items-center transition-all duration-300">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 rounded-lg bg-orange-900/50 border border-orange-500/30 flex items-center justify-center text-orange-400 text-sm">
+                            <i class="fa-solid fa-cloud-sun"></i>
+                        </div>
+                        <span class="font-bold text-sm md:text-base text-slate-200">Ashar</span>
+                    </div>
+                    <span id="time-ashar" class="font-extrabold text-3xl md:text-5xl font-poppins text-orange-300 tracking-wide">15:02</span>
+                </div>
+
+                <!-- Maghrib -->
+                <div id="card-maghrib" class="prayer-card bg-teal-950/40 border border-teal-800/40 rounded-xl p-3 flex justify-between items-center transition-all duration-300">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 rounded-lg bg-teal-900/50 border border-teal-500/30 flex items-center justify-center text-teal-400 text-sm">
+                            <i class="fa-solid fa-moon"></i>
+                        </div>
+                        <span class="font-bold text-sm md:text-base text-slate-200">Maghrib</span>
+                    </div>
+                    <span id="time-maghrib" class="font-extrabold text-3xl md:text-5xl font-poppins text-teal-300 tracking-wide">17:52</span>
+                </div>
+
+                <!-- Isya -->
+                <div id="card-isya" class="prayer-card bg-indigo-950/40 border border-indigo-800/40 rounded-xl p-3 flex justify-between items-center transition-all duration-300">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 rounded-lg bg-indigo-900/50 border border-indigo-500/30 flex items-center justify-center text-indigo-400 text-sm">
+                            <i class="fa-solid fa-star-and-crescent"></i>
+                        </div>
+                        <span class="font-bold text-sm md:text-base text-slate-200">Isya</span>
+                    </div>
+                    <span id="time-isya" class="font-extrabold text-3xl md:text-5xl font-poppins text-indigo-300 tracking-wide">19:01</span>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER: Running Text Marquee -->
+    <footer class="bg-white border border-slate-200 rounded-xl px-4 py-2.5 overflow-hidden flex items-center shadow-2xl relative">
+        <div class="bg-amber-500 text-[#0a1946] text-xs font-black px-3 py-1 rounded uppercase tracking-wider mr-3 flex items-center shrink-0 z-10 shadow-md">
+            <i class="fa-solid fa-bullhorn mr-1.5"></i> Info
+        </div>
+        <div class="overflow-hidden w-full relative">
+            <div id="running-text" class="animate-marquee font-semibold text-sm md:text-base text-[#0a1946] tracking-wide">
+                Sebaik-baik shalat seseorang adalah di rumahnya kecuali shalat wajib • Luruskan dan rapatkan shaf saat shalat berjamaah • Harap mematikan atau mengheningkan suara HP Anda selama berada di area masjid.
+            </div>
+        </div>
+    </footer>
+
+    </div>
+    <!-- END SUB-SCREEN A: DASHBOARD -->
+
+    <!-- ======================================================================
+         SUB-SCREEN B: FOTO ACAK FULLSCREEN
+         Menampilkan 1 gambar acak dari galeri admin, fullscreen tanpa chrome.
+         ====================================================================== -->
+    <div id="screen-photo" class="absolute inset-0 h-full w-full z-30 opacity-0 pointer-events-none transition-opacity duration-1000">
+        <img id="photo-screen-img" src="" alt="" class="w-full h-full object-cover">
+        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/20"></div>
+        <div id="photo-screen-caption" class="absolute bottom-8 left-1/2 -translate-x-1/2 bg-black/60 backdrop-blur-md border border-white/10 px-5 py-2.5 rounded-full text-sm md:text-lg font-semibold text-white tracking-wide">
+            Caption Gambar
+        </div>
+    </div>
+
+    <!-- ======================================================================
+         SUB-SCREEN C: JAM ANALOG FULLSCREEN
+         ====================================================================== -->
+    <div id="screen-clock" class="absolute inset-0 h-full w-full z-30 opacity-0 pointer-events-none transition-opacity duration-1000 flex flex-col items-center justify-center bg-slate-950">
+        <div class="text-center mb-6 md:mb-10">
+            <h2 class="text-amber-400 font-black text-lg md:text-2xl uppercase tracking-widest">Jasma Digital</h2>
+            <p id="clock-screen-date" class="text-slate-400 text-sm md:text-base font-medium mt-1">Selasa, 22 Maret 2026</p>
+        </div>
+        <svg viewBox="0 0 200 200" class="w-56 h-56 sm:w-72 sm:h-72 md:w-96 md:h-96 drop-shadow-2xl">
+            <circle cx="100" cy="100" r="95" fill="#0f172a" stroke="#f59e0b" stroke-width="3"/>
+            <circle cx="100" cy="100" r="86" fill="none" stroke="#1e293b" stroke-width="1"/>
+            <g id="clock-ticks" stroke="#475569" stroke-width="2"></g>
+            <g id="clock-numbers" fill="#94a3b8" font-size="12" font-weight="700" text-anchor="middle" dominant-baseline="middle"></g>
+            <line id="hand-hour" x1="100" y1="100" x2="100" y2="58" stroke="#f1f5f9" stroke-width="6" stroke-linecap="round"/>
+            <line id="hand-minute" x1="100" y1="100" x2="100" y2="38" stroke="#f1f5f9" stroke-width="4" stroke-linecap="round"/>
+            <line id="hand-second" x1="100" y1="100" x2="100" y2="30" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="100" cy="100" r="5" fill="#f59e0b"/>
+        </svg>
+        <div id="clock-screen-digital" class="mt-6 md:mt-8 text-2xl md:text-4xl font-poppins font-extrabold text-slate-200 tracking-widest">00:00:00</div>
+    </div>
+
+    <script>
+        /* -------------------------------------------------------------
+         * DATA CONFIGURATION
+         * ------------------------------------------------------------- */
+        
+        // Config dari Admin Panel di-inject via window.__JASMA_CONFIG__ oleh view1.php.
+        // Kalau file ini dibuka langsung (tanpa lewat view1.php), remoteConfig = null
+        // dan seluruh data di bawah jatuh ke fallback demo -- supaya tetap enak dipakai poles desain.
+        const remoteConfig = window.__JASMA_CONFIG__ || null;
+
+        const slideImages = (remoteConfig && remoteConfig.slideImages && remoteConfig.slideImages.length)
+            ? remoteConfig.slideImages
+            : [
+                {
+                    url: 'https://images.unsplash.com/photo-1542810634-71277d95dcbb?q=80&w=1200&auto=format&fit=crop',
+                    caption: 'Masjid Nabawi, Madinah'
+                },
+                {
+                    url: 'https://images.unsplash.com/photo-1564769625905-50e93615e769?q=80&w=1200&auto=format&fit=crop',
+                    caption: 'Keindahan Arsitektur Islam'
+                },
+                {
+                    url: 'https://images.unsplash.com/photo-1591604466107-ec97de577aff?q=80&w=1200&auto=format&fit=crop',
+                    caption: 'Suasana Dzikir dan Doa'
+                },
+                {
+                    url: 'https://images.unsplash.com/photo-1584551246679-0daf3d275d0f?q=80&w=1200&auto=format&fit=crop',
+                    caption: 'Shalat Berjamaah Keutamaan Utama'
+                }
+            ];
+
+        const prayerSchedule = (remoteConfig && remoteConfig.prayerSchedule) ? remoteConfig.prayerSchedule : {
+            shubuh: "04:28",
+            terbit: "05:39",
+            dzuhur: "11:49",
+            ashar: "15:02",
+            maghrib: "17:52",
+            isya: "19:01"
+        };
+
+        const normalCarouselConfig = (remoteConfig && remoteConfig.normalCarousel) ? remoteConfig.normalCarousel : {
+            dashboardSeconds: 30,
+            photoSeconds: 30,
+            analogClockSeconds: 30
+        };
+
+        const mosqueInfo = (remoteConfig && remoteConfig.mosque) ? remoteConfig.mosque : null;
+
+        /* -------------------------------------------------------------
+         * SLIDESHOW CAROUSEL
+         * ------------------------------------------------------------- */
+        let currentSlide = 0;
+        const slideshowContainer = document.getElementById('slideshow-container');
+        const sliderDots = document.getElementById('slider-dots');
+
+        function initSlideshow() {
+            slideshowContainer.innerHTML = '';
+            sliderDots.innerHTML = '';
+
+            slideImages.forEach((img, index) => {
+                // Slide element
+                const slide = document.createElement('div');
+                slide.className = `absolute inset-0 w-full h-full fade-slide transition-opacity duration-1000 ${index === 0 ? 'opacity-100 z-10' : 'opacity-0 z-0'}`;
+                slide.id = `slide-${index}`;
+                
+                slide.innerHTML = `
+                    <img src="${img.url}" alt="${img.caption}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/1200x800/0f172a/amber?text=Masjid+Digital'">
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-black/30"></div>
+                    <div class="absolute top-4 left-4 bg-black/60 backdrop-blur-md border border-white/10 px-3 py-1 rounded-lg text-xs font-semibold text-slate-300">
+                        <i class="fa-solid fa-camera mr-1 text-amber-400"></i> ${img.caption}
+                    </div>
+                `;
+                slideshowContainer.appendChild(slide);
+
+                // Indicator dot
+                const dot = document.createElement('div');
+                dot.className = `w-2 h-2 rounded-full transition-all duration-300 ${index === 0 ? 'bg-amber-400 w-5' : 'bg-white/40'}`;
+                dot.id = `dot-${index}`;
+                sliderDots.appendChild(dot);
+            });
+
+            // Auto-advance slides every 6 seconds
+            setInterval(nextSlide, 6000);
+        }
+
+        function nextSlide() {
+            const prevSlide = currentSlide;
+            currentSlide = (currentSlide + 1) % slideImages.length;
+
+            // Update Slide Visibilities
+            const prevEl = document.getElementById(`slide-${prevSlide}`);
+            const nextEl = document.getElementById(`slide-${currentSlide}`);
+            const prevDot = document.getElementById(`dot-${prevSlide}`);
+            const nextDot = document.getElementById(`dot-${currentSlide}`);
+
+            if (prevEl && nextEl) {
+                prevEl.classList.remove('opacity-100', 'z-10');
+                prevEl.classList.add('opacity-0', 'z-0');
+
+                nextEl.classList.remove('opacity-0', 'z-0');
+                nextEl.classList.add('opacity-100', 'z-10');
+            }
+
+            if (prevDot && nextDot) {
+                prevDot.className = 'w-2 h-2 rounded-full transition-all duration-300 bg-white/40';
+                nextDot.className = 'w-2 h-2 rounded-full transition-all duration-300 bg-amber-400 w-5';
+            }
+        }
+
+        /* -------------------------------------------------------------
+         * REALTIME CLOCK & PRAYER COUNTDOWN
+         * ------------------------------------------------------------- */
+        const daysIndo = ["Minggu / Ahad", "Senin / Itsnain", "Selasa / Tsulatsa", "Rabu / Arbi'a", "Kamis / Khamis", "Jumat / Jumu'ah", "Sabtu / Sabt"];
+        const daysIndoShort = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+        const monthsIndo = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+
+        function updateClock() {
+            const now = new Date();
+
+            // Format Realtime Clock (HH:MM:SS)
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+
+            document.getElementById('realtime-clock').textContent = `${hours}:${minutes}:${seconds}`;
+
+            // Update Days & Gregorian Date
+            document.getElementById('day-name').textContent = daysIndo[now.getDay()];
+            document.getElementById('gregorian-date').textContent = `${now.getDate()} ${monthsIndo[now.getMonth()]} ${now.getFullYear()} M`;
+
+            // Process Prayer Countdown
+            calculatePrayerCountdown(now);
+
+            // Update Sub-Screen C: Jam Analog (dihitung terus meski sedang tidak ditampilkan, ringan)
+            updateAnalogClock(now);
+        }
+
+        /* -------------------------------------------------------------
+         * SUB-SCREEN C: JAM ANALOG
+         * ------------------------------------------------------------- */
+        function initAnalogClockFace() {
+            const ticksGroup = document.getElementById('clock-ticks');
+            const numbersGroup = document.getElementById('clock-numbers');
+            const center = 100;
+
+            for (let i = 0; i < 60; i++) {
+                const angle = (i * 6) * (Math.PI / 180);
+                const isHourTick = i % 5 === 0;
+                const outerR = 86;
+                const innerR = isHourTick ? 76 : 81;
+
+                const x1 = center + outerR * Math.sin(angle);
+                const y1 = center - outerR * Math.cos(angle);
+                const x2 = center + innerR * Math.sin(angle);
+                const y2 = center - innerR * Math.cos(angle);
+
+                const tick = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                tick.setAttribute('x1', x1.toFixed(2));
+                tick.setAttribute('y1', y1.toFixed(2));
+                tick.setAttribute('x2', x2.toFixed(2));
+                tick.setAttribute('y2', y2.toFixed(2));
+                if (isHourTick) tick.setAttribute('stroke', '#f59e0b');
+                ticksGroup.appendChild(tick);
+            }
+
+            for (let h = 1; h <= 12; h++) {
+                const angle = (h * 30) * (Math.PI / 180);
+                const r = 66;
+                const x = center + r * Math.sin(angle);
+                const y = center - r * Math.cos(angle);
+
+                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                text.setAttribute('x', x.toFixed(2));
+                text.setAttribute('y', y.toFixed(2));
+                text.textContent = h;
+                numbersGroup.appendChild(text);
+            }
+        }
+
+        function updateAnalogClock(now) {
+            const hours24 = now.getHours();
+            const hours = hours24 % 12;
+            const minutes = now.getMinutes();
+            const seconds = now.getSeconds();
+
+            const secondDeg = seconds * 6;
+            const minuteDeg = minutes * 6 + seconds * 0.1;
+            const hourDeg = hours * 30 + minutes * 0.5;
+
+            document.getElementById('hand-second').setAttribute('transform', `rotate(${secondDeg} 100 100)`);
+            document.getElementById('hand-minute').setAttribute('transform', `rotate(${minuteDeg} 100 100)`);
+            document.getElementById('hand-hour').setAttribute('transform', `rotate(${hourDeg} 100 100)`);
+
+            document.getElementById('clock-screen-date').textContent = `${daysIndoShort[now.getDay()]}, ${now.getDate()} ${monthsIndo[now.getMonth()]} ${now.getFullYear()}`;
+            document.getElementById('clock-screen-digital').textContent =
+                `${String(hours24).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+
+        /* -------------------------------------------------------------
+         * ROTASI MODE NORMAL: Dashboard -> Foto Acak -> Jam Analog -> ulang
+         * ------------------------------------------------------------- */
+        const carouselScreens = {
+            dashboard: document.getElementById('screen-dashboard'),
+            photo: document.getElementById('screen-photo'),
+            clock: document.getElementById('screen-clock')
+        };
+        let carouselTimer = null;
+
+        function showCarouselScreen(name) {
+            Object.entries(carouselScreens).forEach(([key, el]) => {
+                if (key === name) {
+                    el.classList.remove('opacity-0', 'pointer-events-none');
+                    el.classList.add('opacity-100');
+                } else {
+                    el.classList.remove('opacity-100');
+                    el.classList.add('opacity-0', 'pointer-events-none');
+                }
+            });
+        }
+
+        function pickRandomPhoto() {
+            const randomImg = slideImages[Math.floor(Math.random() * slideImages.length)];
+            const imgEl = document.getElementById('photo-screen-img');
+            imgEl.src = randomImg.url;
+            imgEl.alt = randomImg.caption;
+            document.getElementById('photo-screen-caption').textContent = randomImg.caption;
+        }
+
+        function runNormalCarousel() {
+            clearTimeout(carouselTimer);
+
+            showCarouselScreen('dashboard');
+            carouselTimer = setTimeout(() => {
+                pickRandomPhoto();
+                showCarouselScreen('photo');
+                carouselTimer = setTimeout(() => {
+                    showCarouselScreen('clock');
+                    carouselTimer = setTimeout(runNormalCarousel, normalCarouselConfig.analogClockSeconds * 1000);
+                }, normalCarouselConfig.photoSeconds * 1000);
+            }, normalCarouselConfig.dashboardSeconds * 1000);
+        }
+
+        function timeToMinutes(timeStr) {
+            const [h, m] = timeStr.split(':').map(Number);
+            return h * 60 + m;
+        }
+
+        function calculatePrayerCountdown(now) {
+            const currentMinutes = now.getHours() * 60 + now.getMinutes();
+            const currentSeconds = now.getSeconds();
+
+            const prayers = [
+                { name: 'Shubuh', time: prayerSchedule.shubuh, key: 'shubuh', baseClass: 'bg-blue-950/40 border border-blue-800/40' },
+                { name: 'Terbit', time: prayerSchedule.terbit, key: 'terbit', baseClass: 'bg-red-950/40 border border-red-800/40' },
+                { name: 'Dzuhur', time: prayerSchedule.dzuhur, key: 'dzuhur', baseClass: 'bg-amber-950/40 border border-amber-800/40' },
+                { name: 'Ashar', time: prayerSchedule.ashar, key: 'ashar', baseClass: 'bg-orange-950/40 border border-orange-800/40' },
+                { name: 'Maghrib', time: prayerSchedule.maghrib, key: 'maghrib', baseClass: 'bg-teal-950/40 border border-teal-800/40' },
+                { name: 'Isya', time: prayerSchedule.isya, key: 'isya', baseClass: 'bg-indigo-950/40 border border-indigo-800/40' }
+            ];
+
+            let nextPrayer = null;
+            
+            // Find next upcoming prayer
+            for (let p of prayers) {
+                if (timeToMinutes(p.time) > currentMinutes) {
+                    nextPrayer = p;
+                    break;
+                }
+            }
+
+            // If past Isya, target Shubuh tomorrow
+            let isTomorrow = false;
+            if (!nextPrayer) {
+                nextPrayer = prayers[0]; // Shubuh
+                isTomorrow = true;
+            }
+
+            // Calculate diff seconds
+            let targetMinutes = timeToMinutes(nextPrayer.time);
+            if (isTomorrow) targetMinutes += 24 * 60; // add 1 day in minutes
+
+            const diffTotalSeconds = (targetMinutes * 60) - (currentMinutes * 60 + currentSeconds);
+
+            const hoursLeft = Math.floor(diffTotalSeconds / 3600);
+            const minsLeft = Math.floor((diffTotalSeconds % 3600) / 60);
+            const secsLeft = diffTotalSeconds % 60;
+
+            const formatPad = (num) => String(num).padStart(2, '0');
+
+            // Update Countdown UI Label & Time
+            document.getElementById('countdown-label').textContent = `Menuju ${nextPrayer.name}`;
+            document.getElementById('countdown-timer').textContent = `${formatPad(hoursLeft)}:${formatPad(minsLeft)}:${formatPad(secsLeft)}`;
+
+            // Highlight Active / Next Prayer Card
+            prayers.forEach(p => {
+                const card = document.getElementById(`card-${p.key}`);
+                if (card) {
+                    if (p.key === nextPrayer.key) {
+                        card.className = "prayer-card bg-amber-500/20 border-2 border-amber-400/80 rounded-xl p-3 flex justify-between items-center shadow-lg shadow-amber-500/10 transform scale-[1.02] transition-all duration-300";
+                    } else {
+                        card.className = `prayer-card ${p.baseClass} rounded-xl p-3 flex justify-between items-center transition-all duration-300`;
+                    }
+                }
+            });
+        }
+
+        // Initialize On Load
+        window.onload = function() {
+            if (mosqueInfo) {
+                if (mosqueInfo.name) document.getElementById('mosque-name').textContent = mosqueInfo.name;
+                if (mosqueInfo.address) document.getElementById('mosque-address').textContent = mosqueInfo.address;
+                if (mosqueInfo.runningText) document.getElementById('running-text').textContent = mosqueInfo.runningText;
+            }
+            Object.keys(prayerSchedule).forEach(key => {
+                const el = document.getElementById(`time-${key}`);
+                if (el) el.textContent = prayerSchedule[key];
+            });
+            initSlideshow();
+            initAnalogClockFace();
+            updateClock();
+            setInterval(updateClock, 1000);
+            runNormalCarousel();
+        };
+    </script>
+</body>
+</html>

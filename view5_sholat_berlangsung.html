@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIEW 5 - Sholat Berlangsung | Jasma Digital</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Orbitron:wght@700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: radial-gradient(circle at 50% 40%, #04140f 0%, #020a08 55%, #000302 100%);
+            color: #ffffff;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        .font-arabic {
+            font-family: 'Amiri', serif;
+        }
+
+        .font-digital {
+            font-family: 'Orbitron', monospace;
+        }
+
+        /* Slow breathing pulse, jauh lebih halus dari view lain -- layar ini harus setenang mungkin */
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); opacity: 0.92; }
+            50% { transform: scale(1.015); opacity: 1; }
+        }
+        .animate-breathe {
+            animation: breathe 6s ease-in-out infinite;
+        }
+
+        /* Cross-fade antar ayat/dzikir */
+        .verse {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 2s ease-in-out;
+            pointer-events: none;
+        }
+        .verse.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+    </style>
+</head>
+<body class="h-screen w-screen flex items-center justify-center relative">
+    <div class="fixed top-1.5 left-1.5 z-50 bg-black/70 border border-white/20 text-[9px] font-bold text-white/80 px-2 py-0.5 rounded-full tracking-widest uppercase pointer-events-none">View 5 &middot; Sholat Berlangsung</div>
+
+    <!-- Ambient Subtle Background Pattern -->
+    <div class="absolute inset-0 bg-[radial-gradient(#0f2a20_1px,transparent_1px)] [background-size:28px_28px] opacity-25 pointer-events-none"></div>
+
+    <!-- Status badge -- satu-satunya elemen "informatif", sisanya sengaja dibuat tenang -->
+    <div class="absolute top-6 left-1/2 -translate-x-1/2 z-10">
+        <div class="inline-flex items-center space-x-2 bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 px-6 py-2 rounded-full text-xs md:text-sm font-bold tracking-widest uppercase backdrop-blur-md">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>Sedang Sholat Berjamaah &mdash; Mohon Tenang</span>
+        </div>
+    </div>
+
+    <!-- CENTERPIECE: Kaligrafi / ayat bergantian, TANPA angka countdown & TANPA jam besar -->
+    <main class="relative z-10 w-full h-full max-w-4xl px-6 animate-breathe">
+        <div id="verse-1" class="verse active">
+            <p class="font-arabic text-5xl sm:text-6xl md:text-7xl text-amber-300 text-center leading-relaxed drop-shadow-lg mb-6">
+                إِنَّ الصَّلَاةَ تَنْهَىٰ عَنِ الْفَحْشَاءِ وَالْمُنكَرِ
+            </p>
+            <p class="text-sm md:text-base text-slate-400 text-center max-w-xl font-medium">
+                "Sesungguhnya shalat itu mencegah dari (perbuatan-perbuatan) keji dan mungkar." (QS. Al-'Ankabut: 45)
+            </p>
+        </div>
+        <div id="verse-2" class="verse">
+            <p class="font-arabic text-5xl sm:text-6xl md:text-7xl text-amber-300 text-center leading-relaxed drop-shadow-lg mb-6">
+                وَأَقِيمُوا الصَّلَاةَ وَآتُوا الزَّكَاةَ وَارْكَعُوا مَعَ الرَّاكِعِينَ
+            </p>
+            <p class="text-sm md:text-base text-slate-400 text-center max-w-xl font-medium">
+                "Dan dirikanlah shalat, tunaikanlah zakat, dan ruku'lah beserta orang-orang yang ruku'." (QS. Al-Baqarah: 43)
+            </p>
+        </div>
+        <div id="verse-3" class="verse">
+            <p class="font-arabic text-5xl sm:text-6xl md:text-7xl text-amber-300 text-center leading-relaxed drop-shadow-lg mb-6">
+                رَبَّنَا تَقَبَّلْ مِنَّا إِنَّكَ أَنتَ السَّمِيعُ الْعَلِيمُ
+            </p>
+            <p class="text-sm md:text-base text-slate-400 text-center max-w-xl font-medium">
+                "Ya Tuhan kami, terimalah dari kami (amalan kami), sesungguhnya Engkaulah Yang Maha Mendengar lagi Maha Mengetahui." (QS. Al-Baqarah: 127)
+            </p>
+        </div>
+    </main>
+
+    <!-- Jam kecil, sengaja diredupkan & di pojok -- hanya referensi, bukan fokus layar -->
+    <div id="realtime-clock" class="fixed bottom-4 right-5 z-10 text-slate-600 font-digital text-sm tracking-widest opacity-60">
+        00:00:00
+    </div>
+
+    <!-- Panel simulasi demo -- hanya untuk pengujian, sembunyikan di production -->
+    <div class="fixed top-20 right-4 z-50 bg-slate-900/90 border border-slate-700 p-3 rounded-xl shadow-2xl backdrop-blur-md max-w-xs text-xs space-y-2">
+        <div class="font-bold text-amber-400 border-b border-slate-700 pb-1 flex justify-between items-center">
+            <span><i class="fa-solid fa-sliders mr-1"></i> Panel Simulasi Demo</span>
+        </div>
+        <p class="text-slate-400">Ganti ayat/dzikir setiap:</p>
+        <div class="flex space-x-1 pt-1">
+            <button onclick="setVerseInterval(5)" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-1 px-2 rounded transition">5s</button>
+            <button onclick="setVerseInterval(15)" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-bold py-1 px-2 rounded transition">15s</button>
+            <button onclick="setVerseInterval(30)" class="flex-1 bg-amber-600 hover:bg-amber-500 text-white font-bold py-1 px-2 rounded transition">30s</button>
+        </div>
+    </div>
+
+    <script>
+        /* -------------------------------------------------------------
+         * ROTASI AYAT / DZIKIR (cross-fade, tanpa countdown)
+         * ------------------------------------------------------------- */
+        const verses = document.querySelectorAll('.verse');
+        let activeIndex = 0;
+        let verseInterval = null;
+
+        function showNextVerse() {
+            verses[activeIndex].classList.remove('active');
+            activeIndex = (activeIndex + 1) % verses.length;
+            verses[activeIndex].classList.add('active');
+        }
+
+        function setVerseInterval(seconds) {
+            clearInterval(verseInterval);
+            verseInterval = setInterval(showNextVerse, seconds * 1000);
+        }
+
+        /* -------------------------------------------------------------
+         * JAM KECIL DI POJOK (referensi saja)
+         * ------------------------------------------------------------- */
+        function updateRealtimeClock() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            document.getElementById('realtime-clock').textContent = `${hours}:${minutes}:${seconds}`;
+        }
+
+        window.onload = function() {
+            updateRealtimeClock();
+            setInterval(updateRealtimeClock, 1000);
+            setVerseInterval(15); // Default: ganti ayat tiap 15 detik
+        };
+    </script>
+</body>
+</html>
