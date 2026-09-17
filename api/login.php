@@ -14,7 +14,7 @@ if ($admin === null || empty($admin['passwordHash'])) {
 
 if ($password !== '' && password_verify($password, $admin['passwordHash'])) {
     session_regenerate_id(true);
-    $_SESSION['jasma_admin'] = true;
+    $_SESSION['dafi_admin'] = true;
     echo json_encode(['ok' => true]);
 } else {
     http_response_code(401);

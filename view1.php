@@ -7,7 +7,7 @@
  * File .html (view1_normal.html / view1_normal_tipe2.html) tetap dipakai
  * apa adanya sebagai "skin" -- dibuka langsung pun masih jalan dengan data
  * demo hardcoded (untuk keperluan poles desain), lihat komentar
- * "window.__JASMA_CONFIG__" di masing-masing file.
+ * "window.__DAFI_CONFIG__" di masing-masing file.
  */
 require __DIR__ . '/api/_config_store.php';
 
@@ -23,7 +23,7 @@ if ($html === false) {
 }
 
 $configJson = json_encode($config, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-$inject = "<script>window.__JASMA_CONFIG__ = {$configJson};</script>\n</head>";
+$inject = "<script>window.__DAFI_CONFIG__ = {$configJson};</script>\n</head>";
 $html = str_replace('</head>', $inject, $html);
 
 header('Content-Type: text/html; charset=utf-8');

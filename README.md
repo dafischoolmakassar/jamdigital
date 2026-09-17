@@ -1,3 +1,3 @@
 # jamdigital
 
-Jasma Digital -- display jam & jadwal sholat masjid.
+Dafi Digital -- display jam & jadwal sholat masjid.

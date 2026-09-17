@@ -16,7 +16,7 @@ function json_body(): array {
 }
 
 function require_login(): void {
-    if (empty($_SESSION['jasma_admin'])) {
+    if (empty($_SESSION['dafi_admin'])) {
         http_response_code(401);
         echo json_encode(['error' => 'Unauthorized -- silakan login dulu']);
         exit;

@@ -42,7 +42,7 @@ function default_config(): array {
     return [
         'activeTheme' => 'tipe1', // 'tipe1' | 'tipe2' -- dipilih dari Admin Panel
         'mosque' => [
-            'name' => 'Masjid Jasma Digital',
+            'name' => 'Masjid Dafi Digital',
             'address' => 'Cebongan Tlogoadi Mlati, DI Yogyakarta',
             'runningText' => "Sebaik-baik shalat seseorang adalah di rumahnya kecuali shalat wajib • Luruskan dan rapatkan shaf saat shalat berjamaah • Harap mematikan atau mengheningkan suara HP Anda selama berada di area masjid."
         ],

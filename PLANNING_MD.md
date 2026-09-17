@@ -1,4 +1,4 @@
-# Rencana Pengembangan: Jasma Digital — Display Jam & Waktu Sholat Masjid
+# Rencana Pengembangan: Dafi Digital — Display Jam & Waktu Sholat Masjid
 
 ## 0. Keputusan yang Sudah Dikonfirmasi
 
@@ -17,9 +17,9 @@
 ## 1. Hasil Review Plan/Prototype Sebelumnya (Gap yang Ditemukan)
 
 File yang sudah ada di folder ini:
-- `jasma_digital_display_masjid.html` (+ varian `(1)`, beda ukuran font jam saja) → ini view **NORMAL**
-- `jasma_digital_countdown_azan.html` → ini sebenarnya view **MENJELANG ADZAN** (ring countdown), BUKAN view "adzan" itu sendiri
-- `jasma_digital_mode_azan.html` → ini view **ADZAN BERKUMANDANG** (kaligrafi + progress bar), audio masih beep placeholder
+- `dafi_digital_display_masjid.html` (+ varian `(1)`, beda ukuran font jam saja) → ini view **NORMAL**
+- `dafi_digital_countdown_azan.html` → ini sebenarnya view **MENJELANG ADZAN** (ring countdown), BUKAN view "adzan" itu sendiri
+- `dafi_digital_mode_azan.html` → ini view **ADZAN BERKUMANDANG** (kaligrafi + progress bar), audio masih beep placeholder
 
 > **Update:** kelima view di atas sudah difiksasi & diberi label pada 2026-09-17 — lihat Bagian 1.1 di bawah untuk nama file final.
 
@@ -38,7 +38,7 @@ Masalah pada draft plan sebelumnya:
 
 ## 1.1 Fiksasi Nama File per View (2026-09-17)
 
-Kelima view sekarang masing-masing punya 1 file HTML sendiri, sudah diberi label on-screen (badge kecil pojok kiri-atas, `pointer-events-none`, aman dihapus saat build production) supaya gampang dibedakan saat dipoles satu-satu. File lama yang terduplikasi (`jasma_digital_display_masjid.html` versi jam berbingkai) dipindah ke `archive/` — bukan dihapus, jaga-jaga masih perlu direferensikan.
+Kelima view sekarang masing-masing punya 1 file HTML sendiri, sudah diberi label on-screen (badge kecil pojok kiri-atas, `pointer-events-none`, aman dihapus saat build production) supaya gampang dibedakan saat dipoles satu-satu. File lama yang terduplikasi (`dafi_digital_display_masjid.html` versi jam berbingkai) dipindah ke `archive/` — bukan dihapus, jaga-jaga masih perlu direferensikan.
 
 | View | File | Status polish |
 |---|---|---|
@@ -47,7 +47,7 @@ Kelima view sekarang masing-masing punya 1 file HTML sendiri, sudah diberi label
 | View 3 — Adzan Berkumandang | `view3_adzan.html` | Sudah ada, siap dipoles |
 | View 4 — Menjelang Iqomah | `view4_menjelang_iqomah.html` | **Baru dibuat** (adaptasi dari View 2, aksen warna emerald supaya beda dari View 2) — perlu direview |
 | View 5 — Sholat Berlangsung | `view5_sholat_berlangsung.html` | **Baru dibuat** (kaligrafi/ayat bergantian, tanpa countdown & tanpa jam besar sesuai catatan risiko #kekhusyukan) — perlu direview |
-| *(arsip)* | `archive/jasma_digital_display_masjid_boxed-clock.html` | Versi lama View 1, disimpan sebagai referensi |
+| *(arsip)* | `archive/dafi_digital_display_masjid_boxed-clock.html` | Versi lama View 1, disimpan sebagai referensi |
 | Admin Panel | `admin_settings.html` | **Sudah tersambung ke backend asli** (2026-09-17) — form Profil Masjid (+ pemilih Tema View 1 + ganti password), Jadwal Sholat (manual harian + pengaturan API untuk fase depan), Durasi & Transisi View, Slideshow Gambar (upload asli ke server), Preview Config JSON. Login & data tidak lagi pakai `localStorage`/password hardcoded — lihat Bagian 4.1 untuk detail backend. |
 | Backend | `api/*.php`, `data/`, `uploads/`, `view1.php` | **Dibangun** (2026-09-17) — lihat Bagian 4.1. |
 | View 1 — Normal (Tipe 2) | `view1_normal_tipe2.html` | **Varian desain alternatif** (2026-09-17), dibuat dari referensi foto display masjid nyata milik user: bar jadwal sholat warna solid penuh (bukan tinted card + ikon), tambahan baris **Imsak** (informasi saja, tidak ikut hitung mundur). Palet direvisi 2x (2026-09-17): (1) hindari pink/ungu → Imsak (stone), Shubuh (biru), Syuruq (slate), Dzuhur (hitam+emas), Ashar (oranye), Maghrib (maroon, sengaja dipertahankan sebagai aksen senja), Isya (emerald), aksen countdown/dot/badge pakai amber, jam pakai `font-semibold` (tidak terlalu bold); (2) tema dasar header/date-bar/panel jam/footer diganti dari coklat tua ke **navy gelap**. Fungsi (slideshow, countdown, sub-rotasi Dashboard/Foto/Jam Analog) identik dengan `view1_normal.html` — hanya beda skin. User memilih salah satu Tipe untuk dipakai final, atau dijadikan opsi tema yang bisa dipilih dari Admin Panel. |
@@ -163,7 +163,7 @@ jamdigital/
 └── uploads/                       ← gambar slideshow hasil upload admin (publik, dibaca kiosk)
 ```
 
-**Bagaimana `view1.php` memilih Tipe 1/Tipe 2:** baca `data/config.json` → field `activeTheme` (`'tipe1'` atau `'tipe2'`) → ambil isi file `view1_normal.html` atau `view1_normal_tipe2.html` apa adanya → sisipkan `<script>window.__JASMA_CONFIG__ = {...}</script>` sebelum `</head>` → kirim ke browser. Kedua file skin sudah dimodifikasi supaya baca `window.__JASMA_CONFIG__` dulu (mosque info, jadwal, gambar slideshow, durasi carousel) dan baru jatuh ke data demo hardcoded kalau variabel itu tidak ada (yaitu saat file dibuka langsung, bukan lewat `view1.php` — jadi alur "buka 1 file HTML, poles desain langsung" yang sudah berjalan sebelumnya tetap jalan).
+**Bagaimana `view1.php` memilih Tipe 1/Tipe 2:** baca `data/config.json` → field `activeTheme` (`'tipe1'` atau `'tipe2'`) → ambil isi file `view1_normal.html` atau `view1_normal_tipe2.html` apa adanya → sisipkan `<script>window.__DAFI_CONFIG__ = {...}</script>` sebelum `</head>` → kirim ke browser. Kedua file skin sudah dimodifikasi supaya baca `window.__DAFI_CONFIG__` dulu (mosque info, jadwal, gambar slideshow, durasi carousel) dan baru jatuh ke data demo hardcoded kalau variabel itu tidak ada (yaitu saat file dibuka langsung, bukan lewat `view1.php` — jadi alur "buka 1 file HTML, poles desain langsung" yang sudah berjalan sebelumnya tetap jalan).
 
 **Alur upload gambar dari Admin Panel:**
 1. Admin pilih tab "Slideshow Gambar", pilih file (JPG/PNG/WEBP, maks 8MB) + isi caption, klik "Tambah ke Slideshow".
