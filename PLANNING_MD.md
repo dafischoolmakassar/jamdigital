@@ -348,6 +348,24 @@ TV biasa (bukan Android TV/Smart TV dengan browser lengkap) **tidak bisa** langs
 - **TV auto-nyala & auto-pilih input HDMI yang benar** setelah listrik mati/nyala lagi (banyak TV komersial/hotel punya setting ini, cek menu *Signage*/*Hotel Mode* kalau ada).
 - **Restart harian**: jadwalkan device restart otomatis 1x/hari (jam 2 pagi misalnya) untuk mencegah browser jadi lambat/nge-lag kalau nyala 24 jam terus-menerus — ini yang dimaksud "Kiosk Watchdog" di Fase 6, belum diimplementasi otomatis dari sisi aplikasi, jadi untuk sekarang atur manual lewat Task Scheduler (Windows) / cron (Linux/Android).
 
+### 8.3 Cara Kelola Admin Panel Sehari-hari
+
+**Login**: buka `https://domain-anda.com/docs/admin_settings.html` dari HP/laptop pengurus masjid (tidak perlu dari device TV-nya). Password: yang sudah diganti dari default `admin123`.
+
+| Tab | Dipakai untuk | Kapan diisi/update |
+|---|---|---|
+| **Profil Masjid** | Nama masjid, alamat, teks berjalan (marquee), **pilih Tema View 1** (Tipe 1/Tipe 2), ganti password | Sekali di awal; teks berjalan bisa diubah kapan saja (mis. pengumuman kegiatan) |
+| **Jadwal Sholat** | Isi 7 waktu (Imsak–Isya) untuk **hari ini** secara manual | **Rutin** — harian atau borongan sebulan sekali kalau jadwalnya dari cetakan Kemenag/kalender masjid. Bagian "Sumber Jadwal (API)" di bawahnya belum aktif, isinya boleh diabaikan dulu |
+| **Durasi & Transisi View** | Berapa lama tiap sub-tampilan (Dashboard/Foto/Jam Analog), berapa menit sebelum adzan mulai countdown, berapa lama adzan/jeda iqomah/lama sholat per waktu, alur khusus Jumat | Sekali di awal, disesuaikan kebiasaan masjid setempat — jarang perlu diubah lagi setelah pas |
+| **Slideshow Gambar** | Upload gambar baru, atur urutan (panah naik/turun), hapus gambar lama | Kapan saja pengurus mau ganti foto (mis. ganti musim/hari besar) |
+| **Preview Config (JSON)** | Lihat mentahan data yang sedang dipakai kiosk, buat ngecek kalau ada yang aneh | Hanya kalau perlu debug |
+
+**Yang penting diketahui:**
+- Setiap klik **Simpan** langsung tersimpan ke server (`data/config.json`) — begitu kiosk **reload halaman**, perubahan langsung kelihatan.
+- Kiosk **tidak auto-refresh sendiri** selama masih standby nyala terus — perubahan baru kelihatan setelah TV/box di-restart (mis. lewat jadwal *Scheduled Restart* di Fully Kiosk jam 2 pagi) atau di-reload manual dari menu Fully Kiosk Browser (ada tombol reload di notification/menu-nya).
+- Kalau butuh lihat perubahan **langsung saat itu juga** (bukan nunggu restart terjadwal), buka Fully Kiosk Browser di box-nya, tarik notification bar / masuk menu settings-nya, cari tombol **"Reload Start URL"**.
+- Karena jadwal sholat masih manual, **jangan lupa update tab Jadwal Sholat** tiap hari/bulan — kalau lupa, kiosk akan terus menampilkan jadwal hari sebelumnya (tidak ada peringatan otomatis untuk ini saat ini).
+
 ---
 
 ## 9. Risiko & Catatan Penting
