@@ -294,7 +294,48 @@ const config = {
 
 ---
 
-## 8. Risiko & Catatan Penting
+## 8. Panduan Deploy ke Shared Hosting & Jalankan di TV
+
+### 8.1 Upload ke Shared Hosting (cPanel)
+
+1. **Upload file**: lewat File Manager cPanel atau FTP (FileZilla), upload seluruh isi folder ini ke `public_html/` (atau ke subfolder/subdomain, mis. `public_html/tv/` atau subdomain `tv.namamasjid.com`).
+2. **Cek versi PHP**: di cPanel → *Select PHP Version* / *MultiPHP Manager*, pastikan domain/subdomain ini pakai **PHP 8.0 ke atas** (dites pakai PHP 8.4). Backend pakai fitur PHP standar (session, `password_hash`, `finfo`), tidak butuh extension aneh-aneh.
+3. **Permission folder**: pastikan folder `data/` dan `uploads/` bisa ditulis PHP (biasanya default `755` sudah cukup di shared hosting; kalau upload/simpan config gagal dengan error permission, coba `775`, hindari `777` kecuali benar-benar terpaksa).
+4. **Cek `.htaccess` aktif**: buka `https://domain-anda.com/data/config.json` langsung dari browser — **harus muncul error 403 Forbidden**. Kalau malah kebuka isinya, berarti hosting pakai Nginx/LiteSpeed yang tidak baca `.htaccess` versi ini — perlu setting setara lewat panel hosting (tanyakan ke support hosting cara blokir akses folder).
+5. **Login pertama**: buka `https://domain-anda.com/admin_settings.html`, login pakai password default `admin123`, **langsung ganti password** lewat tab *Profil Masjid → Ganti Password*.
+6. **Isi data**: profil masjid, jadwal sholat hari ini, upload gambar slideshow, pilih Tema (Tipe 1/Tipe 2) — semua dari Admin Panel, tidak perlu edit kode lagi.
+7. **URL untuk kiosk**: `https://domain-anda.com/view1.php` — **bukan** `view1_normal.html` langsung (itu cuma untuk poles desain, datanya statis/demo).
+
+### 8.2 Menjalankan di TV
+
+TV biasa (bukan Android TV/Smart TV dengan browser lengkap) **tidak bisa** langsung buka URL — perlu 1 device tambahan yang disambungkan ke TV lewat HDMI dan menjalankan browser dalam mode kiosk (fullscreen, tanpa address bar, auto-start). Tiga opsi umum:
+
+**Opsi A — Mini PC / PC bekas + Windows (paling gampang disetup dari yang sudah ada)**
+1. Install Google Chrome.
+2. Buat shortcut baru, isi *Target*-nya:
+   ```
+   "C:\Program Files\Google\Chrome\Application\chrome.exe" --kiosk --noerrdialogs --disable-infobars --overscroll-history-navigation=0 https://domain-anda.com/view1.php
+   ```
+3. Taruh shortcut itu di folder Startup (`shell:startup` di Run dialog) supaya otomatis jalan saat Windows nyala.
+4. Set Windows: auto-login (tidak perlu ketik password saat boot), matikan sleep/screensaver (*Settings → Power*), matikan restart otomatis untuk Windows Update di jam masjid aktif.
+5. Keluar dari kiosk mode saat perlu maintenance: `Alt+F4` (butuh keyboard fisik).
+
+**Opsi B — Android TV Box (murah, hemat listrik, banyak dipakai untuk display masjid)**
+1. Install aplikasi kiosk browser dari Play Store, mis. **Fully Kiosk Browser** (paling umum dipakai untuk signage).
+2. Set URL start ke `https://domain-anda.com/view1.php`, aktifkan "Start on Boot" dan "Keep Screen On".
+3. Sambungkan box ke TV lewat HDMI, nyalakan otomatis bareng TV (pakai fitur CEC di HDMI kalau didukung, atau device menyala sendiri saat dapat listrik).
+
+**Opsi C — Raspberry Pi (kalau sudah familiar Linux)**
+- Sama seperti Opsi A tapi pakai Chromium: `chromium-browser --kiosk https://domain-anda.com/view1.php`, di-set jalan otomatis lewat `autostart` LXDE/systemd service.
+
+**Yang sering kelupaan di semua opsi:**
+- **Internet stabil** di lokasi TV — kalau bisa pakai kabel LAN, bukan cuma WiFi, supaya tidak putus-putus (slideshow & nanti fetch API jadwal butuh internet).
+- **TV auto-nyala & auto-pilih input HDMI yang benar** setelah listrik mati/nyala lagi (banyak TV komersial/hotel punya setting ini, cek menu *Signage*/*Hotel Mode* kalau ada).
+- **Restart harian**: jadwalkan device restart otomatis 1x/hari (jam 2 pagi misalnya) untuk mencegah browser jadi lambat/nge-lag kalau nyala 24 jam terus-menerus — ini yang dimaksud "Kiosk Watchdog" di Fase 6, belum diimplementasi otomatis dari sisi aplikasi, jadi untuk sekarang atur manual lewat Task Scheduler (Windows) / cron (Linux/Android).
+
+---
+
+## 9. Risiko & Catatan Penting
 
 1. **Ketergantungan internet**: jadwal via API + gambar admin-hosted → kiosk harus tetap jalan dengan data cache terakhir kalau internet masjid putus.
 2. **Akurasi API vs jadwal resmi**: hasil hitung Aladhan bisa beda 1–3 menit dari jadwal Kemenag setempat — `correctionMinutes` di admin panel wajib ada, jangan andalkan API mentah-mentah.
