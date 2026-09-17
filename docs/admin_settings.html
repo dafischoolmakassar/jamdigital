@@ -464,11 +464,11 @@
         }
 
         async function loadConfig() {
-            config = await apiGet('api/config.php');
+            config = await apiGet('../api/config.php');
         }
 
         async function persistConfig() {
-            await apiPost('api/config.php', config);
+            await apiPost('../api/config.php', config);
         }
 
         /* -------------------------------------------------------------
@@ -478,7 +478,7 @@
             const pass = document.getElementById('login-password').value;
             document.getElementById('login-error').classList.add('hidden');
             try {
-                const res = await fetch('api/login.php', {
+                const res = await fetch('../api/login.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ password: pass })
@@ -497,7 +497,7 @@
         }
 
         async function doLogout() {
-            try { await fetch('api/logout.php', { method: 'POST' }); } catch (e) { /* abaikan, tetap reload */ }
+            try { await fetch('../api/logout.php', { method: 'POST' }); } catch (e) { /* abaikan, tetap reload */ }
             location.reload();
         }
 
@@ -505,7 +505,7 @@
             const currentPassword = document.getElementById('cfg-current-password').value;
             const newPassword = document.getElementById('cfg-new-password').value;
             try {
-                await apiPost('api/change_password.php', { currentPassword, newPassword });
+                await apiPost('../api/change_password.php', { currentPassword, newPassword });
                 document.getElementById('cfg-current-password').value = '';
                 document.getElementById('cfg-new-password').value = '';
                 showToast('Password berhasil diganti');
@@ -635,6 +635,12 @@
         /* -------------------------------------------------------------
          * SLIDESHOW MANAGER (upload asli ke server via api/upload.php)
          * ------------------------------------------------------------- */
+        // admin_settings.html ada di docs/, sedangkan uploads/ ada di root -- jadi path relatif
+        // "uploads/xxx.jpg" yang tersimpan di config perlu ditambah "../" khusus utk preview di sini.
+        function previewUrl(url) {
+            return url.startsWith('uploads/') ? '../' + url : url;
+        }
+
         function renderSlideList() {
             const list = document.getElementById('slide-list');
             const empty = document.getElementById('slide-empty');
@@ -650,7 +656,7 @@
                 const row = document.createElement('div');
                 row.className = 'flex items-center gap-3 bg-slate-950 border border-slate-800 rounded-lg p-2.5';
                 row.innerHTML = `
-                    <img src="${img.url}" class="w-16 h-12 object-cover rounded-md border border-slate-800" onerror="this.src='https://placehold.co/160x120/0f172a/64748b?text=Gambar'">
+                    <img src="${previewUrl(img.url)}" class="w-16 h-12 object-cover rounded-md border border-slate-800" onerror="this.src='https://placehold.co/160x120/0f172a/64748b?text=Gambar'">
                     <div class="flex-1 min-w-0">
                         <p class="text-sm font-semibold text-slate-200 truncate">${img.caption || '(tanpa caption)'}</p>
                         <p class="text-[10px] text-slate-500 truncate">${img.url.startsWith('uploads/') ? 'Upload sendiri &middot; ' + img.url : img.url}</p>
@@ -680,7 +686,7 @@
             formData.append('caption', caption);
 
             try {
-                const res = await fetch('api/upload.php', { method: 'POST', body: formData });
+                const res = await fetch('../api/upload.php', { method: 'POST', body: formData });
                 const data = await res.json();
                 if (!res.ok || !data.ok) throw new Error(data.error || 'Upload gagal');
 
@@ -747,7 +753,7 @@
          * ------------------------------------------------------------- */
         window.onload = async function() {
             try {
-                const session = await apiGet('api/session.php');
+                const session = await apiGet('../api/session.php');
                 if (session.loggedIn) {
                     await loadConfig();
                     document.getElementById('login-gate').classList.add('hidden');

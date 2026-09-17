@@ -40,7 +40,9 @@ Masalah pada draft plan sebelumnya:
 
 Kelima view sekarang masing-masing punya 1 file HTML sendiri, sudah diberi label on-screen (badge kecil pojok kiri-atas, `pointer-events-none`, aman dihapus saat build production) supaya gampang dibedakan saat dipoles satu-satu. File lama yang terduplikasi (`dafi_digital_display_masjid.html` versi jam berbingkai) dipindah ke `archive/` — bukan dihapus, jaga-jaga masih perlu direferensikan.
 
-| View | File | Status polish |
+> **Update 2026-09-17 (lanjutan):** semua file HTML di tabel bawah (termasuk `archive/`) sudah dipindah ke dalam folder **`docs/`** — jadi path lengkapnya `docs/view1_normal.html`, `docs/admin_settings.html`, dst. Nama di kolom "File" di bawah ini tanpa prefix `docs/` supaya ringkas, tapi lokasi fisiknya semua di dalam `docs/`.
+
+| View | File (di dalam `docs/`) | Status polish |
 |---|---|---|
 | View 1 — Normal | `view1_normal.html` | Sudah ada, siap dipoles |
 | View 2 — Menjelang Adzan | `view2_menjelang_adzan.html` | Sudah ada, siap dipoles |
@@ -126,7 +128,7 @@ State machine dievaluasi setiap detik dari satu sumber waktu (`Date.now()`), buk
   - `audio.js` — beep/chime via Web Audio API (titik ekstensi untuk audio adzan asli nanti)
 - **Fetch API** ke Aladhan API (`method=20` untuk pendekatan Kemenag RI) berdasarkan koordinat masjid, di-refresh 1x/hari (misal jam 00:05) + fallback ke cache `localStorage` kalau device offline saat refresh.
 - **FontAwesome 6 + Google Fonts** (Inter, Plus Jakarta Sans, Orbitron, Amiri) — dipertahankan dari prototype.
-- Kiosk dijalankan **fullscreen via Chrome kiosk mode** (`chrome --kiosk https://domain/view1_normal.html`) di Android TV box/mini PC, resolusi target 1920×1080 landscape — bukan trik Fullscreen API dari JS, karena browser modern menolak fullscreen otomatis tanpa gesture user. Kiosk mode menyelesaikan ini di level device/OS.
+- Kiosk dijalankan **fullscreen via Chrome kiosk mode** (`chrome --kiosk https://domain/view1.php`) di Android TV box/mini PC, resolusi target 1920×1080 landscape — bukan trik Fullscreen API dari JS, karena browser modern menolak fullscreen otomatis tanpa gesture user. Kiosk mode menyelesaikan ini di level device/OS.
 - **Watchdog**: auto-reload halaman 1x/hari di jam sepi (misal jam 02:00) untuk mencegah memory leak dari proses yang berjalan 24 jam.
 
 ### Admin Panel (terpisah, diakses dari HP/PC pengurus masjid)
@@ -145,10 +147,16 @@ Karena keputusannya "ada halaman admin", ini butuh backend ringan meskipun kiosk
 
 ```
 jamdigital/
-├── view1.php                     ← URL KIOSK (bukan view1_normal.html langsung!)
-├── view1_normal.html             ← skin Tipe 1, tetap bisa dibuka langsung utk poles desain
-├── view1_normal_tipe2.html       ← skin Tipe 2, sama
-├── admin_settings.html           ← Admin Panel, konsumsi api/*.php
+├── view1.php                     ← URL KIOSK (bukan docs/view1_normal.html langsung!)
+├── docs/                         ← SEMUA file HTML frontend dikumpulkan di sini
+│   ├── view1_normal.html         ← skin Tipe 1, tetap bisa dibuka langsung utk poles desain
+│   ├── view1_normal_tipe2.html   ← skin Tipe 2, sama
+│   ├── view2_menjelang_adzan.html
+│   ├── view3_adzan.html
+│   ├── view4_menjelang_iqomah.html
+│   ├── view5_sholat_berlangsung.html
+│   ├── admin_settings.html       ← Admin Panel, konsumsi ../api/*.php
+│   └── archive/                  ← prototype lama, disimpan sbg referensi
 ├── api/
 │   ├── _config_store.php         ← baca/tulis data/config.json, default_config()
 │   ├── _bootstrap.php            ← session PHP + auth guard, dipakai endpoint lain
@@ -162,6 +170,8 @@ jamdigital/
 │   └── .htaccess                  ← blokir akses langsung dari browser ke folder ini
 └── uploads/                       ← gambar slideshow hasil upload admin (publik, dibaca kiosk)
 ```
+
+> **Catatan path**: `view1.php`, `api/`, `data/`, dan `uploads/` tetap di root (bukan ikut pindah ke `docs/`) supaya URL publik (`/view1.php`, `/api/...`, `/uploads/...`) tidak berubah. Hanya file HTML murni yang dipindah ke `docs/` — `docs/admin_settings.html` sudah disesuaikan supaya panggilan ke API pakai `../api/...` dan preview gambar upload pakai `../uploads/...`.
 
 **Bagaimana `view1.php` memilih Tipe 1/Tipe 2:** baca `data/config.json` → field `activeTheme` (`'tipe1'` atau `'tipe2'`) → ambil isi file `view1_normal.html` atau `view1_normal_tipe2.html` apa adanya → sisipkan `<script>window.__DAFI_CONFIG__ = {...}</script>` sebelum `</head>` → kirim ke browser. Kedua file skin sudah dimodifikasi supaya baca `window.__DAFI_CONFIG__` dulu (mosque info, jadwal, gambar slideshow, durasi carousel) dan baru jatuh ke data demo hardcoded kalau variabel itu tidak ada (yaitu saat file dibuka langsung, bukan lewat `view1.php` — jadi alur "buka 1 file HTML, poles desain langsung" yang sudah berjalan sebelumnya tetap jalan).
 
@@ -302,7 +312,7 @@ const config = {
 2. **Cek versi PHP**: di cPanel → *Select PHP Version* / *MultiPHP Manager*, pastikan domain/subdomain ini pakai **PHP 8.0 ke atas** (dites pakai PHP 8.4). Backend pakai fitur PHP standar (session, `password_hash`, `finfo`), tidak butuh extension aneh-aneh.
 3. **Permission folder**: pastikan folder `data/` dan `uploads/` bisa ditulis PHP (biasanya default `755` sudah cukup di shared hosting; kalau upload/simpan config gagal dengan error permission, coba `775`, hindari `777` kecuali benar-benar terpaksa).
 4. **Cek `.htaccess` aktif**: buka `https://domain-anda.com/data/config.json` langsung dari browser — **harus muncul error 403 Forbidden**. Kalau malah kebuka isinya, berarti hosting pakai Nginx/LiteSpeed yang tidak baca `.htaccess` versi ini — perlu setting setara lewat panel hosting (tanyakan ke support hosting cara blokir akses folder).
-5. **Login pertama**: buka `https://domain-anda.com/admin_settings.html`, login pakai password default `admin123`, **langsung ganti password** lewat tab *Profil Masjid → Ganti Password*.
+5. **Login pertama**: buka `https://domain-anda.com/docs/admin_settings.html`, login pakai password default `admin123`, **langsung ganti password** lewat tab *Profil Masjid → Ganti Password*.
 6. **Isi data**: profil masjid, jadwal sholat hari ini, upload gambar slideshow, pilih Tema (Tipe 1/Tipe 2) — semua dari Admin Panel, tidak perlu edit kode lagi.
 7. **URL untuk kiosk**: `https://domain-anda.com/view1.php` — **bukan** `view1_normal.html` langsung (itu cuma untuk poles desain, datanya statis/demo).
 

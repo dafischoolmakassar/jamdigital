@@ -4,9 +4,9 @@
  * `chrome --kiosk https://domain/view1.php`, BUKAN membuka file .html
  * langsung -- supaya tema (Tipe 1/Tipe 2) & data dari Admin Panel terbaca.
  *
- * File .html (view1_normal.html / view1_normal_tipe2.html) tetap dipakai
- * apa adanya sebagai "skin" -- dibuka langsung pun masih jalan dengan data
- * demo hardcoded (untuk keperluan poles desain), lihat komentar
+ * File .html (docs/view1_normal.html / docs/view1_normal_tipe2.html) tetap
+ * dipakai apa adanya sebagai "skin" -- dibuka langsung pun masih jalan dengan
+ * data demo hardcoded (untuk keperluan poles desain), lihat komentar
  * "window.__DAFI_CONFIG__" di masing-masing file.
  */
 require __DIR__ . '/api/_config_store.php';
@@ -15,7 +15,7 @@ $config = get_config();
 $theme = ($config['activeTheme'] ?? 'tipe1') === 'tipe2' ? 'tipe2' : 'tipe1';
 $file = $theme === 'tipe2' ? 'view1_normal_tipe2.html' : 'view1_normal.html';
 
-$html = file_get_contents(__DIR__ . '/' . $file);
+$html = file_get_contents(__DIR__ . '/docs/' . $file);
 if ($html === false) {
     http_response_code(500);
     echo 'View file tidak ditemukan: ' . htmlspecialchars($file);
