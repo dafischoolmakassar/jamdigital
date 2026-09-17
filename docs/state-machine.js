@@ -108,7 +108,7 @@
      * pas jatuh temponya lagi di tengah salah satu state itu, reload
      * ditunda otomatis sampai kembali NORMAL.
      */
-    const AUTO_RELOAD_MINUTES = 10;
+    const AUTO_RELOAD_MINUTES = 2;
     let lastReloadAt = Date.now();
 
     function maybeAutoReload() {
