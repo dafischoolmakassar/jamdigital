@@ -100,21 +100,51 @@
     let currentPrayerKey = null;
 
     /**
-     * AUTO-RELOAD -- perlu untuk browser biasa (bukan Fully Kiosk Browser
-     * yang punya fitur "Scheduled Restart" sendiri). Tanpa ini, perubahan
-     * dari Admin Panel (profil, jadwal, tema, slideshow) baru kepakai kalau
-     * ada yang reload manual. Hanya reload saat state NORMAL supaya tidak
-     * memotong tampilan Adzan/Iqomah/Sholat yang sedang berjalan -- kalau
-     * pas jatuh temponya lagi di tengah salah satu state itu, reload
+     * SOFT-REFRESH BERKALA -- perlu untuk browser biasa (bukan Fully Kiosk
+     * Browser yang punya fitur "Scheduled Restart" sendiri) supaya perubahan
+     * dari Admin Panel (profil, jadwal, slideshow) sampai ke layar tanpa
+     * perlu reload manual. SENGAJA TIDAK pakai location.reload() -- reload
+     * penuh mereset fullscreen (baik dari klik manual/Fullscreen API maupun
+     * kadang PWA), jadi sebagai gantinya fetch ulang config lewat AJAX lalu
+     * suruh halaman update tampilannya sendiri lewat window.__DAFI_APPLY_CONFIG__
+     * (didefinisikan di view1_normal.html / view1_normal_tipe2.html) --
+     * dokumen TIDAK PERNAH reload/navigasi, jadi fullscreen tetap aman.
+     *
+     * Pengecualian: kalau activeTheme (Tipe 1 <-> Tipe 2) berubah, itu perlu
+     * ganti file HTML sama sekali, jadi khusus kasus itu tetap reload penuh.
+     *
+     * Hanya jalan saat state NORMAL supaya tidak mengganggu Adzan/Iqomah/Sholat
+     * yang sedang berjalan -- kalau pas jatuh tempo di tengah state itu,
      * ditunda otomatis sampai kembali NORMAL.
      */
     const AUTO_RELOAD_MINUTES = 2;
     let lastReloadAt = Date.now();
+    let isRefreshing = false;
 
-    function maybeAutoReload() {
+    async function maybeAutoReload() {
         const elapsedMs = Date.now() - lastReloadAt;
-        if (elapsedMs >= AUTO_RELOAD_MINUTES * 60000 && currentState === 'NORMAL') {
-            location.reload();
+        if (elapsedMs < AUTO_RELOAD_MINUTES * 60000 || currentState !== 'NORMAL' || isRefreshing) return;
+
+        lastReloadAt = Date.now();
+        isRefreshing = true;
+        try {
+            const res = await fetch('api/config.php', { cache: 'no-store' });
+            const fresh = await res.json();
+
+            if ((fresh.activeTheme || 'tipe1') !== (config.activeTheme || 'tipe1')) {
+                // Tema berubah -- butuh ganti file HTML (Tipe 1 <-> Tipe 2), tidak bisa tanpa reload penuh.
+                location.reload();
+                return;
+            }
+
+            Object.assign(config, fresh);
+            if (typeof window.__DAFI_APPLY_CONFIG__ === 'function') {
+                window.__DAFI_APPLY_CONFIG__(fresh);
+            }
+        } catch (e) {
+            // Gagal fetch (mis. koneksi masjid putus sebentar) -- diamkan, coba lagi di siklus berikutnya
+        } finally {
+            isRefreshing = false;
         }
     }
 

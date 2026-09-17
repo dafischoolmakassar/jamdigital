@@ -11,7 +11,7 @@
 | Hosting | Shared hosting (cPanel-style) — **tidak** tersedia Node.js/VPS. Backend wajib **PHP + SQLite/JSON file**, bukan Node/Express. |
 | Fullscreen | **Kiosk mode Chrome** di device (`chrome --kiosk https://domain/view1.php`), bukan trik JS Fullscreen API — browser tidak izinkan fullscreen otomatis tanpa gesture user, kiosk mode di level OS/device yang menyelesaikan ini. |
 | Mode Normal (View 1) | Bukan 1 tampilan statis — berputar otomatis 3 sub-tampilan: **Dashboard → Foto Acak fullscreen → Jam Analog fullscreen → ulang**, dengan durasi tiap sub-tampilan **bisa diatur dari Admin Panel** (default 30 detik masing-masing). |
-| Auto-reload kiosk | Karena device TV pakai browser biasa (bukan Fully Kiosk Browser yang punya *Scheduled Restart* sendiri), `docs/state-machine.js` reload halaman sendiri tiap **2 menit** (`AUTO_RELOAD_MINUTES`) — **tapi hanya saat state NORMAL**, supaya tidak memotong Adzan/Iqomah/Sholat yang sedang berjalan. Ini juga jadi cara perubahan dari Admin Panel (profil, jadwal, tema, slideshow) sampai ke layar TV tanpa perlu reload manual — jadi paling lama nunggu ~2 menit, bukan instan. |
+| Auto-refresh kiosk | Karena device TV pakai browser biasa (bukan Fully Kiosk Browser yang punya *Scheduled Restart* sendiri), `docs/state-machine.js` fetch ulang config tiap **2 menit** (`AUTO_RELOAD_MINUTES`) dan update tampilan langsung lewat `window.__DAFI_APPLY_CONFIG__` — **bukan `location.reload()`**, supaya fullscreen (klik manual atau PWA) tidak pernah ke-reset. Hanya jalan saat state NORMAL. Pengecualian: kalau **Tema** (Tipe 1/Tipe 2) yang berubah, itu tetap butuh reload penuh karena beda file HTML. |
 
 ---
 

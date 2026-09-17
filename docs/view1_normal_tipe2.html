@@ -238,7 +238,7 @@
          * ------------------------------------------------------------- */
         const remoteConfig = window.__DAFI_CONFIG__ || null;
 
-        const slideImages = (remoteConfig && remoteConfig.slideImages && remoteConfig.slideImages.length)
+        let slideImages = (remoteConfig && remoteConfig.slideImages && remoteConfig.slideImages.length)
             ? remoteConfig.slideImages
             : [
                 { url: 'https://images.unsplash.com/photo-1542810634-71277d95dcbb?q=80&w=1200&auto=format&fit=crop', caption: 'Masjid Nabawi, Madinah' },
@@ -248,11 +248,11 @@
             ];
 
         // Imsak (informasi saja, biasanya Shubuh - 10 menit)
-        const imsakTime = (remoteConfig && remoteConfig.prayerSchedule && remoteConfig.prayerSchedule.imsak)
+        let imsakTime = (remoteConfig && remoteConfig.prayerSchedule && remoteConfig.prayerSchedule.imsak)
             ? remoteConfig.prayerSchedule.imsak
             : "04:18";
 
-        const prayerSchedule = (remoteConfig && remoteConfig.prayerSchedule) ? remoteConfig.prayerSchedule : {
+        let prayerSchedule = (remoteConfig && remoteConfig.prayerSchedule) ? remoteConfig.prayerSchedule : {
             shubuh: "04:28",
             terbit: "05:39",
             dzuhur: "11:49",
@@ -261,22 +261,25 @@
             isya: "19:01"
         };
 
-        const normalCarouselConfig = (remoteConfig && remoteConfig.normalCarousel) ? remoteConfig.normalCarousel : {
+        let normalCarouselConfig = (remoteConfig && remoteConfig.normalCarousel) ? remoteConfig.normalCarousel : {
             dashboardSeconds: 30,
             photoSeconds: 30,
             analogClockSeconds: 30
         };
 
-        const mosqueInfo = (remoteConfig && remoteConfig.mosque) ? remoteConfig.mosque : null;
+        let mosqueInfo = (remoteConfig && remoteConfig.mosque) ? remoteConfig.mosque : null;
 
         /* -------------------------------------------------------------
          * SLIDESHOW CAROUSEL
          * ------------------------------------------------------------- */
         let currentSlide = 0;
+        let slideInterval = null;
         const slideshowContainer = document.getElementById('slideshow-container');
         const sliderDots = document.getElementById('slider-dots');
 
         function initSlideshow() {
+            clearInterval(slideInterval);
+            currentSlide = 0;
             slideshowContainer.innerHTML = '';
             sliderDots.innerHTML = '';
 
@@ -300,7 +303,7 @@
                 sliderDots.appendChild(dot);
             });
 
-            setInterval(nextSlide, 6000);
+            slideInterval = setInterval(nextSlide, 6000);
         }
 
         function nextSlide() {
@@ -508,8 +511,8 @@
             }, normalCarouselConfig.dashboardSeconds * 1000);
         }
 
-        // Initialize On Load
-        window.onload = function() {
+        // Terapkan mosque info + jadwal ke DOM (dipakai saat load awal & saat soft-refresh)
+        function applyMosqueAndSchedule() {
             if (mosqueInfo) {
                 if (mosqueInfo.name) document.getElementById('mosque-name').textContent = mosqueInfo.name;
                 if (mosqueInfo.address) document.getElementById('mosque-address').textContent = mosqueInfo.address;
@@ -520,6 +523,31 @@
                 if (el) el.textContent = prayerSchedule[key];
             });
             document.getElementById('time-imsak').textContent = imsakTime;
+        }
+
+        /**
+         * Dipanggil dari docs/state-machine.js tiap auto-reload interval, dengan
+         * config TERBARU hasil fetch ulang -- TANPA reload halaman, supaya
+         * fullscreen (baik dari klik manual maupun PWA) tidak pernah terganggu.
+         * Tema (activeTheme) TIDAK ditangani di sini karena butuh ganti file HTML
+         * (Tipe 1 <-> Tipe 2) -- itu tetap perlu reload penuh, ditangani di state-machine.js.
+         */
+        window.__DAFI_APPLY_CONFIG__ = function(freshConfig) {
+            if (freshConfig.mosque) mosqueInfo = freshConfig.mosque;
+            if (freshConfig.prayerSchedule) {
+                prayerSchedule = freshConfig.prayerSchedule;
+                imsakTime = freshConfig.prayerSchedule.imsak || imsakTime;
+            }
+            if (freshConfig.normalCarousel) normalCarouselConfig = freshConfig.normalCarousel;
+            if (freshConfig.slideImages && freshConfig.slideImages.length) slideImages = freshConfig.slideImages;
+
+            applyMosqueAndSchedule();
+            initSlideshow(); // aman dipanggil ulang -- interval lama di-clear duluan
+        };
+
+        // Initialize On Load
+        window.onload = function() {
+            applyMosqueAndSchedule();
             initSlideshow();
             initAnalogClockFace();
             updateClock();
