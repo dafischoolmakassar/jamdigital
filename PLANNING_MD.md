@@ -350,6 +350,17 @@ TV biasa (bukan Android TV/Smart TV dengan browser lengkap) **tidak bisa** langs
 **Opsi C — Raspberry Pi (kalau sudah familiar Linux)**
 - Sama seperti Opsi A tapi pakai Chromium: `chromium-browser --kiosk https://domain-anda.com/view1.php`, di-set jalan otomatis lewat `autostart` LXDE/systemd service.
 
+**Opsi D — PWA "Install App" (alternatif kalau device cuma punya browser biasa, bukan Fully Kiosk)**
+
+Aplikasi ini sudah dikonfigurasi sebagai **PWA** (`manifest.json` + `sw.js` + ikon di `icons/`, di-suntik `view1.php`). Dengan `"display": "fullscreen"` di manifest, membuka aplikasi dari ikon yang di-install akan **fullscreen total tanpa browser chrome sama sekali** — tanpa perlu Fully Kiosk Browser:
+
+1. Buka `https://domain-anda.com/view1.php` di Chrome (Android/desktop).
+2. Chrome akan menawarkan **"Install app"** / **"Add to Home Screen"** (lewat menu titik tiga kalau tidak muncul otomatis).
+3. Setelah di-install, buka aplikasinya dari ikon di home screen (bukan dari browser) — inilah yang fullscreen otomatis.
+4. Auto-reload (Bagian 0) & state machine tetap jalan sama persis seperti dibuka lewat browser biasa, karena tetap `view1.php` yang dimuat, cuma tanpa UI browser di sekitarnya.
+
+**Catatan**: kalau nanti mau ganti desain ikon, jalankan ulang `php scripts/generate_icons.php` (butuh extension PHP GD) — script ini generate ulang `icons/icon-192.png` & `icons/icon-512.png` (siluet masjid navy+amber sederhana).
+
 **Yang sering kelupaan di semua opsi:**
 - **Internet stabil** di lokasi TV — kalau bisa pakai kabel LAN, bukan cuma WiFi, supaya tidak putus-putus (slideshow & nanti fetch API jadwal butuh internet).
 - **TV auto-nyala & auto-pilih input HDMI yang benar** setelah listrik mati/nyala lagi (banyak TV komersial/hotel punya setting ini, cek menu *Signage*/*Hotel Mode* kalau ada).

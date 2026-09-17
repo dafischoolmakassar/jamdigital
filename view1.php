@@ -23,7 +23,24 @@ if ($html === false) {
 }
 
 $configJson = json_encode($config, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-$headInject = "<script>window.__DAFI_CONFIG__ = {$configJson};</script>\n</head>";
+// Manifest + theme-color + registrasi service worker -- supaya bisa di-"Install
+// App"/"Add to Home Screen" dan jalan fullscreen TANPA browser chrome sama
+// sekali begitu dibuka dari ikon home screen (lihat manifest.json: display=fullscreen).
+// Ini jadi alternatif dari Fully Kiosk Browser kalau device TV cuma punya browser biasa.
+$headInject = <<<HTML
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0a0f1c">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    <script>window.__DAFI_CONFIG__ = {$configJson};</script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function () {
+                navigator.serviceWorker.register('sw.js').catch(function () { /* abaikan kalau gagal */ });
+            });
+        }
+    </script>
+</head>
+HTML;
 $html = str_replace('</head>', $headInject, $html);
 
 // Overlay + state machine untuk otomatis pindah ke View 2-5 (Menjelang Adzan,
