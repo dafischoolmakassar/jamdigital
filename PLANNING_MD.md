@@ -330,10 +330,15 @@ TV biasa (bukan Android TV/Smart TV dengan browser lengkap) **tidak bisa** langs
 4. Set Windows: auto-login (tidak perlu ketik password saat boot), matikan sleep/screensaver (*Settings → Power*), matikan restart otomatis untuk Windows Update di jam masjid aktif.
 5. Keluar dari kiosk mode saat perlu maintenance: `Alt+F4` (butuh keyboard fisik).
 
-**Opsi B — Android TV Box (murah, hemat listrik, banyak dipakai untuk display masjid)**
-1. Install aplikasi kiosk browser dari Play Store, mis. **Fully Kiosk Browser** (paling umum dipakai untuk signage).
-2. Set URL start ke `https://domain-anda.com/view1.php`, aktifkan "Start on Boot" dan "Keep Screen On".
-3. Sambungkan box ke TV lewat HDMI, nyalakan otomatis bareng TV (pakai fitur CEC di HDMI kalau didukung, atau device menyala sendiri saat dapat listrik).
+**Opsi B — Android TV Box (dipilih untuk instalasi ini)**
+1. Install **Fully Kiosk Browser** dari Play Store di box-nya (kalau box tidak punya Play Store/cuma sideload APK, unduh APK-nya dari situs resmi `fully-kiosk.com`).
+2. Buka app-nya, kalau diminta izin (Device Admin, Overlay/Draw over other apps, Accessibility) — **kasih semua izin itu**, itu yang dipakai buat mengunci layar supaya orang tidak bisa keluar dari kiosk secara tidak sengaja.
+3. Di menu *Web Content Settings*: isi **Start URL** = `https://dafischool.sch.id/app/jamdigital/view1.php`.
+4. Di menu *Device Management*: aktifkan **"Start on Boot"** (auto-jalan tiap box nyala) dan **"Keep Screen On"** (layar tidak pernah mati sendiri).
+5. Di menu *Kiosk Mode Settings*: aktifkan supaya tombol Home/Back/Recent Apps dikunci (biar tidak ada yang tidak sengaja keluar ke launcher Android biasa).
+6. **Fitur bonus yang langsung menjawab "restart harian" di catatan risiko #4**: Fully Kiosk punya *Scheduled Restart* / *Screen Off & On Schedule* bawaan — set restart otomatis 1x/hari (mis. jam 02:00 pagi) dari menu *Device Management → Restart App/Device Scheduled*. Ini gratis dipakai tanpa perlu setup cron/Task Scheduler terpisah.
+7. Sambungkan box ke TV lewat HDMI. Kalau TV & box sama-sama support HDMI-CEC, aktifkan supaya keduanya nyala bareng saat listrik masuk; kalau tidak, pastikan minimal box-nya sendiri auto-boot begitu dapat daya (biasanya default Android TV box sudah begitu).
+8. **Opsional tapi disarankan**: beli lisensi *Fully Kiosk Browser Plus* (sekali bayar, ~US$7–15) untuk hilangkan watermark/nag screen versi gratis dan buka fitur *Device Owner Mode* (lock lebih ketat) — tidak wajib, tapi lebih rapi untuk dipakai user akhir (jamaah), bukan cuma testing.
 
 **Opsi C — Raspberry Pi (kalau sudah familiar Linux)**
 - Sama seperti Opsi A tapi pakai Chromium: `chromium-browser --kiosk https://domain-anda.com/view1.php`, di-set jalan otomatis lewat `autostart` LXDE/systemd service.
