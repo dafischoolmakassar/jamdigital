@@ -99,6 +99,25 @@
     let currentState = 'NORMAL';
     let currentPrayerKey = null;
 
+    /**
+     * AUTO-RELOAD -- perlu untuk browser biasa (bukan Fully Kiosk Browser
+     * yang punya fitur "Scheduled Restart" sendiri). Tanpa ini, perubahan
+     * dari Admin Panel (profil, jadwal, tema, slideshow) baru kepakai kalau
+     * ada yang reload manual. Hanya reload saat state NORMAL supaya tidak
+     * memotong tampilan Adzan/Iqomah/Sholat yang sedang berjalan -- kalau
+     * pas jatuh temponya lagi di tengah salah satu state itu, reload
+     * ditunda otomatis sampai kembali NORMAL.
+     */
+    const AUTO_RELOAD_MINUTES = 10;
+    let lastReloadAt = Date.now();
+
+    function maybeAutoReload() {
+        const elapsedMs = Date.now() - lastReloadAt;
+        if (elapsedMs >= AUTO_RELOAD_MINUTES * 60000 && currentState === 'NORMAL') {
+            location.reload();
+        }
+    }
+
     function applyState(result) {
         const overlay = document.getElementById('state-overlay');
         const iframe = document.getElementById('state-iframe');
@@ -139,6 +158,7 @@
             currentPrayerKey = result.prayerKey || null;
             applyState(result);
         }
+        maybeAutoReload();
     }
 
     window.addEventListener('load', function () {
