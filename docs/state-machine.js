@@ -31,6 +31,41 @@
         SHOLAT: 'docs/view5_sholat_berlangsung.html'
     };
 
+    /**
+     * SINKRONISASI JAM SERVER -- jangan 100% percaya jam sistem device TV.
+     * Android TV box murah sering tidak punya RTC baterai, jadi jamnya bisa
+     * salah/reset tiap kali listrik mati-nyala, atau timezone-nya salah
+     * setting. `clockOffsetMs` = selisih antara jam server vs jam device,
+     * dihitung ulang tiap TIME_SYNC_INTERVAL_MINUTES. `getCorrectedNow()`
+     * dipakai di seluruh state machine ini (gantinya `new Date()` polos),
+     * dan diekspos ke `window.__DAFI_NOW__` supaya view1_normal.html /
+     * view1_normal_tipe2.html juga pakai jam yang sama utk jam realtime
+     * yang ditampilkan ke jamaah.
+     */
+    const TIME_SYNC_INTERVAL_MINUTES = 15;
+    let clockOffsetMs = 0;
+
+    async function syncServerTime() {
+        try {
+            const requestStart = Date.now();
+            const res = await fetch('api/time.php', { cache: 'no-store' });
+            const data = await res.json();
+            const requestEnd = Date.now();
+            // Asumsikan waktu tempuh request-response simetris, koreksi separuhnya
+            // supaya offset lebih akurat (bukan cuma pakai waktu terima mentah).
+            const roundTripMs = requestEnd - requestStart;
+            const estimatedServerNowAtReceive = data.epochMs + Math.round(roundTripMs / 2);
+            clockOffsetMs = estimatedServerNowAtReceive - requestEnd;
+        } catch (e) {
+            // Gagal sync (offline dsb) -- pertahankan offset terakhir yang berhasil.
+        }
+    }
+
+    function getCorrectedNow() {
+        return new Date(Date.now() + clockOffsetMs);
+    }
+    window.__DAFI_NOW__ = getCorrectedNow;
+
     function parseTimeToday(hhmm, base) {
         const parts = String(hhmm || '00:00').split(':').map(Number);
         const d = new Date(base);
@@ -172,7 +207,10 @@
             target: result.target.toISOString(),
             mosqueName: mosque.name || '',
             mosqueAddress: mosque.address || '',
-            runningText: mosque.runningText || ''
+            runningText: mosque.runningText || '',
+            // Supaya jam realtime & countdown DI DALAM iframe juga terkoreksi,
+            // bukan cuma andalkan jam device iframe itu sendiri.
+            correctedNowMs: String(getCorrectedNow().getTime())
         });
 
         iframe.src = FILE_MAP[result.state] + '?' + params.toString();
@@ -181,7 +219,7 @@
     }
 
     function tick() {
-        const now = new Date();
+        const now = getCorrectedNow();
         const result = computeMasterState(now);
         if (result.state !== currentState || (result.prayerKey || null) !== currentPrayerKey) {
             currentState = result.state;
@@ -192,7 +230,10 @@
     }
 
     window.addEventListener('load', function () {
-        tick();
-        setInterval(tick, 1000);
+        syncServerTime().finally(function () {
+            tick();
+            setInterval(tick, 1000);
+        });
+        setInterval(syncServerTime, TIME_SYNC_INTERVAL_MINUTES * 60000);
     });
 })();

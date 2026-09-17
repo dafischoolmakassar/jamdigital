@@ -213,10 +213,19 @@
         const realMosqueName = urlParams.get('mosqueName');
         const realMosqueAddress = urlParams.get('mosqueAddress');
         const realRunningText = urlParams.get('runningText');
+        const realCorrectedNowMs = urlParams.get('correctedNowMs');
 
         if (realMosqueName) document.getElementById('mosque-name').textContent = realMosqueName;
         if (realMosqueAddress) document.getElementById('mosque-address').textContent = realMosqueAddress;
         if (realRunningText) document.getElementById('running-text').textContent = realRunningText;
+
+        // Selisih jam device iframe ini vs jam server-terkoreksi yang dikirim parent
+        // (state-machine.js) -- supaya jam & countdown di sini juga akurat, bukan
+        // cuma andalkan jam sistem device yang bisa salah/drift.
+        const clockOffsetMs = realCorrectedNowMs ? (parseInt(realCorrectedNowMs, 10) - Date.now()) : 0;
+        function getCorrectedNow() {
+            return new Date(Date.now() + clockOffsetMs);
+        }
         if (realPrayerName) document.getElementById('current-prayer-name').textContent = realPrayerName.toUpperCase();
         if (realTarget) document.getElementById('demo-panel').style.display = 'none';
 
@@ -241,8 +250,8 @@
          * REALTIME CLOCK & DATE LOGIC
          * ------------------------------------------------------------- */
         function updateRealtimeClock() {
-            const now = new Date();
-            
+            const now = getCorrectedNow();
+
             const hours = String(now.getHours()).padStart(2, '0');
             const minutes = String(now.getMinutes()).padStart(2, '0');
             const seconds = String(now.getSeconds()).padStart(2, '0');
@@ -351,7 +360,7 @@
             setInterval(updateRealtimeClock, 1000);
 
             if (realTarget) {
-                const diffSec = Math.max(1, Math.round((new Date(realTarget) - new Date()) / 1000));
+                const diffSec = Math.max(1, Math.round((new Date(realTarget) - getCorrectedNow()) / 1000));
                 totalSeconds = diffSec;
                 remainingSeconds = diffSec;
                 const minutesFormatted = totalSeconds >= 60 ? `${(totalSeconds / 60).toFixed(totalSeconds % 60 === 0 ? 0 : 1)} Menit` : `${totalSeconds} Detik`;

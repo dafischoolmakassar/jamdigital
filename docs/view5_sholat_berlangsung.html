@@ -137,8 +137,13 @@
         /* -------------------------------------------------------------
          * JAM KECIL DI POJOK (referensi saja)
          * ------------------------------------------------------------- */
+        let clockOffsetMs = 0;
+        function getCorrectedNow() {
+            return new Date(Date.now() + clockOffsetMs);
+        }
+
         function updateRealtimeClock() {
-            const now = new Date();
+            const now = getCorrectedNow();
             const hours = String(now.getHours()).padStart(2, '0');
             const minutes = String(now.getMinutes()).padStart(2, '0');
             const seconds = String(now.getSeconds()).padStart(2, '0');
@@ -148,9 +153,13 @@
         window.onload = function() {
             const urlParams = new URLSearchParams(location.search);
             const realPrayerName = urlParams.get('prayer');
+            const realCorrectedNowMs = urlParams.get('correctedNowMs');
             if (realPrayerName) {
                 document.getElementById('sholat-status-label').textContent = `Sedang Sholat ${realPrayerName} Berjamaah — Mohon Tenang`;
             }
+            // Selisih jam device iframe ini vs jam server-terkoreksi yang dikirim parent
+            // (state-machine.js) -- supaya jam kecil di pojok ini juga akurat.
+            if (realCorrectedNowMs) clockOffsetMs = parseInt(realCorrectedNowMs, 10) - Date.now();
 
             updateRealtimeClock();
             setInterval(updateRealtimeClock, 1000);
