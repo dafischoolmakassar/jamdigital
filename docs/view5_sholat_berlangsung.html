@@ -65,7 +65,7 @@
     <div class="absolute top-6 left-1/2 -translate-x-1/2 z-10">
         <div class="inline-flex items-center space-x-2 bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 px-6 py-2 rounded-full text-xs md:text-sm font-bold tracking-widest uppercase backdrop-blur-md">
             <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span>Sedang Sholat Berjamaah &mdash; Mohon Tenang</span>
+            <span id="sholat-status-label">Sedang Sholat Berjamaah &mdash; Mohon Tenang</span>
         </div>
     </div>
 
@@ -146,6 +146,12 @@
         }
 
         window.onload = function() {
+            const urlParams = new URLSearchParams(location.search);
+            const realPrayerName = urlParams.get('prayer');
+            if (realPrayerName) {
+                document.getElementById('sholat-status-label').textContent = `Sedang Sholat ${realPrayerName} Berjamaah — Mohon Tenang`;
+            }
+
             updateRealtimeClock();
             setInterval(updateRealtimeClock, 1000);
             setVerseInterval(15); // Default: ganti ayat tiap 15 detik

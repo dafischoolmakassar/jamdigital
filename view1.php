@@ -23,8 +23,20 @@ if ($html === false) {
 }
 
 $configJson = json_encode($config, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-$inject = "<script>window.__DAFI_CONFIG__ = {$configJson};</script>\n</head>";
-$html = str_replace('</head>', $inject, $html);
+$headInject = "<script>window.__DAFI_CONFIG__ = {$configJson};</script>\n</head>";
+$html = str_replace('</head>', $headInject, $html);
+
+// Overlay + state machine untuk otomatis pindah ke View 2-5 (Menjelang Adzan,
+// Adzan, Menjelang Iqomah, Sholat Berlangsung) berdasarkan jadwal sholat asli.
+// Lihat docs/state-machine.js untuk logikanya.
+$bodyInject = <<<HTML
+    <div id="state-overlay" class="fixed inset-0 z-40 opacity-0 pointer-events-none transition-opacity duration-1000">
+        <iframe id="state-iframe" class="w-full h-full border-0" title="Status Sholat"></iframe>
+    </div>
+    <script src="docs/state-machine.js"></script>
+</body>
+HTML;
+$html = str_replace('</body>', $bodyInject, $html);
 
 header('Content-Type: text/html; charset=utf-8');
 header('Cache-Control: no-store, must-revalidate');
